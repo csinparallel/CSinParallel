@@ -42,7 +42,7 @@ In the example code you are given, the variable *h* is the same as ∆x. We use 
 [Lots of detail from Khan Academy](https://www.khanacademy.org/math/calculus-home/integration-calc/trapezoidal-rule-calc/v/rectangular-and-trapezoidal-riemann-approximations)
 
 
-### First examine the differences in the code and do some manual examination.
+## First examine the differences in the code and do some manual examination.
 
 The first thing to do is to observe how this code runs manually. We should always do this before diving into our experiments.
 
@@ -51,14 +51,14 @@ For `trap-seq.c`, there are two places where there are two different ways of pri
   - Look for a a comment saying "output for debugging". Uncomment these **two printfs** while you look at how the program is working and get a feel for how long certain problem sizes take. 
   - Look for the comment that starts with "output for sending to a spreadsheet". Comment this single printf line out for now.
 
-After uncommenting and commenting, save the file over to the server and 'make' the sequential version.
+After uncommenting and commenting, save the file and 'make' the sequential version.
 
 For `trap-omp.c`, compare it side-by-side to the `trap-seq.c` code and find the places where openMP pragmas have been added and the way the code is timed has changed.
 
   - Look for the **two** debugging output printfs and uncomment them.
   - Look for the simpler printf line that prints the time followed by a tab. Comment it for now while you try the parallel version.
 
-After uncommenting and commenting, save the file over to the server and 'make' the parallel version.
+After uncommenting and commenting, save the file and 'make' the parallel version.
 
 ## Goal 1: Get a feel for the working code
 
@@ -102,7 +102,27 @@ The code already has timing built into it. The `trap-seq` executable can take in
     ./trap-seq 4194304
     
 We refer to the number of trapezoids, which represent the work being done, as
-the **problem size**. Try running it for a few problem sizes, using powers of 2 from 1048576 onwards.
+the **problem size**. Try running it for a few problem sizes, using powers of 2 from 8388608 onwards. For this sequential O(N) algorithm, as you double the problem size (number of trapezoids), the time should double.
+Here are some powers of 2 that you can try. Note that 2<sup>28</sup>, or 268435456, will take over 5 seconds on modern CPUs, so you likely won't want to wait much longer than the value for 2<sup>30</sup>
+
+| n  | 2<sup>n</sup>|
+|----|-------------|
+| 23 | 8388608     |
+| 24 | 16777216    |
+| 25 | 33554432    |
+| 26 | 67108864    |
+| 27 | 134217728   |
+| 28 | 268435456   |
+| 29 | 536870912   |
+| 30 | 1073741824  |
+| 31 | 2147483648  |
+| 32 | 4294967296  |
+| 33 | 8589934592  |
+| 34 | 17179869184 |
+| 35 | 34359738368 |
+| 36 | 68719476736 |
+
+Now let's see how parallelism makes the code run faster.
 
 Also try running your parallel version, `trap-omp`, varying the problem size, and using different numbers of threads. An interesting sequence to run to help you see the speedup of the code is this (be patient for the sequential one):
 
@@ -150,18 +170,21 @@ Note that the problem sizes vary from 1048576 to 67108864 and the number of thre
 
 2. The second script, `run_weak_tests.sh`, is designed to determine whether a parallel solution is weakly scalable. (Sadly weakly scalable is a bad term, because many parallel programs have this property, and it is a good thing, because we can run bigger problems by using more threads and get results fast.) Try this script like this:
 
-    bash ./run_weak_tests.sh 2 1048576 3
+    bash ./run_weak_tests.sh 2 16777216 3
 
-The above running of this script created data designed for an existing spreadsheet. The argument 2 is for the number of replications to run, and the number 1048576 is a starting problem size. The number 3 is the number of weak scalability lines to be graphed on the spreadsheet.
+The above running of this script created data designed for an existing spreadsheet. The argument 2 is for the number of replications to run, and the number 16777216 is a starting problem size. The number 3 is the number of weak scalability lines to be graphed on the spreadsheet.
 
 ### Get your complete data
+
+You could skip this step and simply see what some sample speedup, efficiency, and weak scalability data looks like by viewing [this Google spreadsheet](
+https://docs.google.com/spreadsheets/d/1g83euOuJMZaCZ6R-GzaJNPWQuTkyqTsazbol7o7Uitw/edit?usp=sharing)
 
 Now that you are familiar with the scripts, run the full experiments by trying 5 replicates and placing the output into a file, like this:
 
     bash ./run_strong_tests.sh 5 > trap_strong_out.tsv
-    bash ./run_weak_tests.sh 5 1048576 3 > trap_weak_out.tsv
+    bash ./run_weak_tests.sh 5 16777216 3 > trap_weak_out.tsv
 
-Note that you could try 10 tests if you wish, but it will take longer and you are likely doing this with other students doing the same thing. The spreadsheet will work whether you use 5 or 10 test replications.
+Each of these will take a few minutes. Note that you could try 10 tests if you wish, but it will take longer and you are likely doing this with other students doing the same thing. The spreadsheet will work whether you use 5 or 10 test replications.
 
 Now be sure to sync your remote server files to your local machine, so that you have the .tsv files to import into your spreadsheet (next step).
 

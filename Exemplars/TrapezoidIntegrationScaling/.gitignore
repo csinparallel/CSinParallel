@@ -2,3 +2,6 @@
 trap-seq 
 trap-omp
 
+#script output files
+trap_strong_out.tsv
+trap_weak_out.tsv

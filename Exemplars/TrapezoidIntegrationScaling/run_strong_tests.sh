@@ -24,7 +24,7 @@ num_times=$1
 # Note: you should set the problem sizes that you want to run for a problem.
 #       The following are fairly good for the trapezoidal rule problem
 #       and for the strong scalability problem sizes and number of threads.
-printf "trial \t#th\t1048576 \t2097152 \t4194304 \t8388608 \t16777216 \t33664432 \t67108864\n"
+printf "trial \t#th\t8388608 \t16777216 \t33664432 \t67108864 \t 268435456\n"
 
 # each trial will run num_times using a cretain number of threads
 for num_threads in 1 2 4 6 8 12 16
@@ -38,7 +38,7 @@ do
       printf "$counter\t$num_threads\t"
 
      # run each problem size once
-      for problem_size in 1048576 2097152 4194304 8388608 16777216 33554432 67108864
+      for problem_size in 8388608 16777216 33554432 67108864 268435456
       do
         if [  "$num_threads" == "1"  ]; then
           command="./trap-seq $problem_size"

@@ -7,7 +7,7 @@
 # Libby Shoop     Macalester College
 #
 import argparse      # for command-line arguments
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 from fire_functions import *
 
@@ -53,13 +53,13 @@ def main():
     percent_burned = get_percent_burned(forest, row_size)
     print("Iterations until fire burns out: {}".format(iter))
     print("Percent burned: {0:4.3f}".format(percent_burned))
-    print_forest(forest)
+    # print_forest(forest)
 
-    # plt.figure("Single Forest Fire Simulation",figsize=(7,7))
-    # plt.pcolor(forest, cmap=plt.cm.get_cmap('Greens', 2))
-    # plt.title("{0}x{0} grid of trees, Probability {3:3.2f}\nIterations until fire burns out: {1} Percent burned: {2:4.3f}\nGreen squares are live trees after one simulation".format(row_size, iter, percent_burned, prob_spread))
+    plt.figure("Single Forest Fire Simulation",figsize=(7,7))
+    plt.pcolor(forest, cmap=plt.cm.get_cmap('Greens', 2))
+    plt.title("{0}x{0} grid of trees, Probability {3:3.2f}\nIterations until fire burns out: {1} Percent burned: {2:4.3f}\nGreen squares are live trees after one simulation".format(row_size, iter, percent_burned, prob_spread))
 
-    #plt.show()
+    plt.show()
 
 
 ########## Run the main function

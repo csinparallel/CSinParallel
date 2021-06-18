@@ -37,12 +37,12 @@ def main():
         sendValue = id
         if odd(id):
             #odd processes receive from their paired 'neighbor', then send
-            comm.send(sendValue, dest=((id-1)%numProcesses))
-            receivedValue = comm.recv(source=((id-1)%numProcesses))
+            receivedValue = comm.recv(source=id-1)
+            comm.send(sendValue, dest=id-1)
         else :
             #even processes receive from their paired 'neighbor', then send
-            comm.send(sendValue, dest=((id+1)%numProcesses))
-            receivedValue = comm.recv(source=((id+1)%numProcesses))
+            receivedValue = comm.recv(source=id+1)
+            comm.send(sendValue, dest=id+1)
 
         print("Process {} of {} on {} computed {} and received {}"\
         .format(id, numProcesses, myHostName, sendValue, receivedValue))

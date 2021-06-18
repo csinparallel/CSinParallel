@@ -25,7 +25,7 @@ def main():
     numProcesses = comm.Get_size()  #total number of processes running
     myHostName = MPI.Get_processor_name()  #machine name running the code
 
-    REPS = 16
+    REPS = 8
 
     if (numProcesses <= REPS):
 

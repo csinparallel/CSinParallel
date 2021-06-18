@@ -20,9 +20,9 @@ if (len(sys.argv) < 3):
     print("     [opt] is an optional argument for the program if needed (rare)")
     sys.exit(0)
 
-if (path.exists("./cluster_nodes")):
-    print("using ./cluster_nodes file for names of machines")
-    command = "mpirun -np " + sys.argv[2] + " -hostfile ./cluster_nodes -map-by node " + "python " + sys.argv[1]
+if (path.exists("/home/hd-cluster/hostfile")):
+    print("using ~/hostfile file for names of machines")
+    command = "mpirun -np " + sys.argv[2] + " -hostfile /home/hd-cluster/hostfile -map-by node " + "python " + sys.argv[1]
 else:
     command = "mpirun -np " + sys.argv[2] + " python " + sys.argv[1]
 

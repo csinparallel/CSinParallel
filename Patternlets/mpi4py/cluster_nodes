@@ -1,0 +1,7 @@
+# To use with several hosts on a cluster, edit this file to add their names or ip addresses
+#localhost
+head slots=4
+node1 slots=4
+node2 slots=4
+node3 slots=4
+

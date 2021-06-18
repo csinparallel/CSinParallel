@@ -1,0 +1,4 @@
+#executables
+dd_serial 
+dd_omp 
+dd_threads

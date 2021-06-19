@@ -1,6 +1,5 @@
 # Drug design exemplar code for various platforms.  
 
-CSinParallel is an NSF-funded project to support instructors seeking to add Parallel and Distributed Computing (PDC) to their undergraduate computer science courses.  The csinparallel.org website provides free resources towards this goal, including a number of teaching modules for inserting a few days of instruction on a PDC topic to a given course.
 
 The Drug Design Exemplar CSinParallel module https://csinparallel.org/csinparallel/modules/drugDesign.html considers the application of scoring candidate drug "ligands" against a protein, using a simple representative scoring computation.  Implementations are provided for numerous PDC platforms based on a map-reduce structural pattern.  The range of platforms enables this module to be incorporated in a wide variety of course or extracurricular contexts.  
 

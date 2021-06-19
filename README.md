@@ -7,7 +7,10 @@ This public repository contains some of the code examples from the teaching modu
 The CSinParallel team is:
 
 Dick Brown, St. Olaf College
+
 Libby Shoop, Macalester College
+
 Joel Adams, Calvin University
+
 Suzanne Matthews, USMA West Point
 

@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
 
   /* parse command-line arg for number of rectangles */
   if (argc > 1) {
-    n = atoi(argv[1]);  // needs to be positive, though we have no check here for that
+    n = strtol(argv[1], NULL, 10);  // needs to be positive, though we have no check here for that
   }
 
   double h = (b - a) / n; /* width of subdivision */

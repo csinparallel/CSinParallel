@@ -44,9 +44,9 @@ public class DynamicLoadBalance {
             worker(MPI.COMM_WORLD);
        }   
        MPI.Finalize();
-     }
+    }
 
-     private static int[] genTasks(int numTasks) {
+    private static int[] genTasks(int numTasks) {
         int[] tasks = new int[numTasks];
         Random r = new Random(1000); // use the same seed
         for(int i = 0; i < numTasks; i++) {

@@ -1,0 +1,15 @@
+#/bin/sh
+#
+# Joel C. Adams, Calvin University, November 2019.
+#
+# Change the following line to the name of your Java class
+
+PROG=DynamicLoadBalance
+
+if [ "$#" -gt 0 ]; then
+	mpirun --mca shmem posix --oversubscribe -np $1 java $PROG
+else
+	echo 'Please specify the number of processes (should be > 1), for example to run with 4 processes (3 workers):'
+	echo "$0 4"
+fi
+

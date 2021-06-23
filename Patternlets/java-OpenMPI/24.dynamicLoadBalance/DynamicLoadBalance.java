@@ -13,22 +13,12 @@
  * - Explain behavior of the dynamic load balancing of the available work
  */
 
+import mpi.*;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 import java.util.Random;
 
-import mpi.*;
-import java.nio.IntBuffer;
-
 public class DynamicLoadBalance {
-    private static int[] genTasks(int numTasks) {
-        int[] tasks = new int[numTasks];
-        Random r = new Random(1000); // use the same seed
-        for(int i = 0; i < numTasks; i++) {
-            tasks[i] = r.nextInt(8) + 1;
-        }
-        return tasks;
-    }
-
     public static final int MASTER = 0;
 
     // tags that can be applied to messages
@@ -55,6 +45,15 @@ public class DynamicLoadBalance {
        }   
        MPI.Finalize();
      }
+
+     private static int[] genTasks(int numTasks) {
+        int[] tasks = new int[numTasks];
+        Random r = new Random(1000); // use the same seed
+        for(int i = 0; i < numTasks; i++) {
+            tasks[i] = r.nextInt(8) + 1;
+        }
+        return tasks;
+    }
 
     private static void worker(Comm comm) throws MPIException {
         // keep receiving messages and do work, unless tagged to 'die'

@@ -1,0 +1,6 @@
+[submodule "Patternlets/java-OpenMPI/notebook"]
+	path = Patternlets/java-OpenMPI/notebook
+	url = https://github.com/rkurniawati/mpijava.git
+[submodule "Patternlets/MPI/notebook"]
+	path = Patternlets/MPI/notebook
+	url = https://github.com/rkurniawati/mpiC.git

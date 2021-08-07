@@ -1,4 +1,4 @@
-PROG  = ForkJoin2
+PROG  = Spmd
 CLASS = $(PROG).class
 SRC   = $(PROG).java
 PJ    = ../lib/Pyjama.jar

@@ -1,4 +1,4 @@
-PROG  = ForkJoin
+PROG  = MasterWorker
 CLASS = $(PROG).class
 SRC   = $(PROG).java
 PJ    = ../lib/Pyjama.jar

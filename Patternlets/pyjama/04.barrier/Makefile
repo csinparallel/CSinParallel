@@ -1,4 +1,4 @@
-PROG  = ForkJoin
+PROG  = Barrier
 CLASS = $(PROG).class
 SRC   = $(PROG).java
 PJ    = ../lib/Pyjama.jar

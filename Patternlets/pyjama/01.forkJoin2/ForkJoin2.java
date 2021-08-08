@@ -4,7 +4,7 @@
  *      and changing the number of threads two ways.
  *
  * Joel Adams, Calvin College, May 2013.
- * Adapted for Java by Ruth Kurniawati, Westfield State University, July, 2021
+ * Adapted for Java/Pyjama by Ruth Kurniawati, Westfield State University, July, 2021
  *
  * Usage: 
  *   make run

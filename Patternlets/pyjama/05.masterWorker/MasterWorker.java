@@ -1,13 +1,15 @@
-/* masterWorker.c
+/* MasterWorker.java
  * ... illustrates the master-worker pattern in OpenMP
  *
  * Joel Adams, Calvin College, November 2009.
  *
- * Usage: make run
+ * Usage: 
+ *   make run [numThreads]
+ *   Example: make run 4
  *
  * Exercise: 
  * - Compile and run as is.
- * - Uncomment #pragma directive, re-compile and re-run
+ * - Remove the #omp directive, re-compile and re-run
  * - Compare and trace the different executions.
  */
 

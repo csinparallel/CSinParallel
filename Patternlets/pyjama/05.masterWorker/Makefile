@@ -6,7 +6,7 @@ CC    = java -jar $(PJ)
 VM	  = java -cp $(PJ):. 
 
 run: $(CLASS)
-	$(VM) $(PROG)
+	$(VM) $(PROG) $(ARGS)
 
 $(CLASS): $(SRC)
 	$(CC) $(SRC)

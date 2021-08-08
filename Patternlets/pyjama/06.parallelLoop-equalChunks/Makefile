@@ -1,4 +1,4 @@
-PROG  = Barrier
+PROG  = ParallelLoopEqualChunks
 CLASS = $(PROG).class
 SRC   = $(PROG).java
 PJ    = ../lib/Pyjama.jar
@@ -9,7 +9,7 @@ run: $(CLASS)
 	$(VM) $(PROG) $(ARGS)
 
 $(CLASS): $(SRC)
-	$(CC) $(SRC) 
+	$(CC) $(SRC)
 
 clean:
 	rm -f $(PROG)*class *~ *#

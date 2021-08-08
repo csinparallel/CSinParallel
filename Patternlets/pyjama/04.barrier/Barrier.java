@@ -1,10 +1,13 @@
-/* barrier.c
+/* Barrier.java
  * ... illustrates the use of the OpenMP barrier command,
  * 	using the commandline to control the number of threads...
  *
  * Joel Adams, Calvin College, May 2013.
+ * Adapted for Java/Pyjama by Ruth Kurniawati, Westfield State University, July, 2021
  *
- * Usage: ./barrier [numThreads]
+ * Usage: 
+ *   make run ARGS=[numThreads]
+ *   Example: make run ARGS=8
  * 
  * Exercise:
  * - Compile & run several times, noting interleaving of outputs.

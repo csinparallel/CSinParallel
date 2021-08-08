@@ -3,8 +3,10 @@
  *      pattern using two basic OpenMP commands...
  *
  * Joel Adams, Calvin College, November 2009.
+ * Adapted for Java/Pyjama by Ruth Kurniawati, Westfield State University, July, 2021
  *
- * Usage: ./spmd
+ * Usage: 
+ *   make run
  *
  * Exercise:
  * - Compile & run 

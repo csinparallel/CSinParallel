@@ -5,7 +5,9 @@
  *
  * Joel Adams, Calvin College, November 2009.
  *
- * Usage: ./spmd2 [numThreads]
+ * Usage: 
+ *   make run ARGS=[numThreads]
+ *   Example: make run ARGS=4
  *
  * Exercise:
  * - Compile & run with no commandline args 

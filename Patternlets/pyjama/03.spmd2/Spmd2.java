@@ -17,19 +17,29 @@
  *    (if necessary, compare to 02.spmd)
  */
 
-class Spmd2 {
-    static int id, numThreads;
+import java.util.Random;
 
+class Spmd2 {
     public static void main(String[] args) {
         if (args.length >= 1) {
             Pyjama.omp_set_num_threads(Integer.parseInt(args[0]));
         }
         System.out.println();
 
-        //#omp parallel 
+
+        int id, numThreads;
+        Random rand;
+        //#omp parallel shared(id, numThreads) private(rand)
         {
-            id = Pyjama.omp_get_thread_num();
+            // To make it easier to observe the race condition, uncomment the code below:
+            //
+            rand = new Random(); // use a fixed seed for reproduceability
+            try {
+                Thread.sleep(rand.nextInt());
+            } catch(Exception ex) {};
+
             numThreads = Pyjama.omp_get_num_threads();
+            id = Pyjama.omp_get_thread_num();
             System.out.println("Hello from thread "+ id +" of " + numThreads);
         }
 

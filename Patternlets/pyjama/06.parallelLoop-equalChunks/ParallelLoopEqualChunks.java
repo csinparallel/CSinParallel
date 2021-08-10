@@ -15,7 +15,7 @@
  * - try with different numbers of threads, e.g.: 2, 3, 4, 6, 8
  */
 
-class ParallelLoopEqualChunks {
+public class ParallelLoopEqualChunks {
     final static int REPS = 16;
     public static void main(String[] args) {
         if (args.length >= 1) {

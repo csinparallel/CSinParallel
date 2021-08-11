@@ -32,7 +32,7 @@ public class Reduction2 {
         if (args.length > 1) {
             numThreads = Integer.parseInt(args[0]);
         }
-        int n = 1000000000;
+        int n = 100000000;
         if (args.length > 2) {
             n = Integer.parseInt(args[1]);
         }
@@ -42,6 +42,8 @@ public class Reduction2 {
         for (int i = 0; i < n; i++) 
             arr[i] = ThreadLocalRandom.current().nextInt(0, 101);
         
+        long startTime = System.currentTimeMillis();
+
         //#omp parallel num_threads(numThreads) shared(n, arr) reduction(max:max_val)
         {
             //#omp for
@@ -52,7 +54,10 @@ public class Reduction2 {
             }
         }
 
-        for (int i = 0; i < n; i++) System.out.print(arr[i] + " ");
+        //for (int i = 0; i < n; i++) System.out.print(arr[i] + " ");
+        long endTime = System.currentTimeMillis();
+        
         System.out.println("\nmax value = " + max_val);
+        System.out.println("Time = " + (endTime-startTime) + " ms");
     }
 }

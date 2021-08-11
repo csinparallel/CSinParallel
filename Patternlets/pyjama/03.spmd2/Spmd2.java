@@ -7,7 +7,7 @@
  *
  * Usage: 
  *   make run ARGS=[numThreads]
- *   Example: make run ARGS=4
+ *   Example: make run ARGS=10
  *
  * Exercise:
  * - Compile & run with no commandline args 
@@ -17,7 +17,8 @@
  *    (if necessary, compare to 02.spmd)
  */
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import pj.Pyjama;
 
 class Spmd2 {
     public static void main(String[] args) {
@@ -26,17 +27,12 @@ class Spmd2 {
         }
         System.out.println();
 
-
         int id, numThreads;
-        Random rand;
-        //#omp parallel shared(id, numThreads) private(rand)
+        //#omp parallel shared(id, numThreads)
         {
-            // To make it easier to observe the race condition, uncomment the code below:
+            // To make it easier to observe the race condition, uncomment the code below that will make the thread sleep for 1-2 ms.
             //
-            rand = new Random(); // use a fixed seed for reproduceability
-            try {
-                Thread.sleep(rand.nextInt());
-            } catch(Exception ex) {};
+            // try { Thread.sleep(ThreadLocalRandom.current().nextInt(1, 3)); } catch(InterruptedException e) {}
 
             numThreads = Pyjama.omp_get_num_threads();
             id = Pyjama.omp_get_thread_num();

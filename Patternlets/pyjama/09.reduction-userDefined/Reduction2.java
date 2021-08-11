@@ -1,69 +1,58 @@
-/* Reduction2.java computes a table of factorial values,
- *  OpenMP's reduction using the multiplication operator.
+/* Reduction2.java computes the maximum using reduction.
  *
- *  Joel Adams, Calvin College, December 2015.
- *  Adapted for Java/Pyjama by Ruth Kurniawati, Westfield State University, July, 2021
+ * Pyjama OpenMP's reduction using the max function.
+ * Note that Pyjama currently does NOT support arbitrary 
+ * user-defined function in the reduction clause. 
+ * 
+ * Adapted from Thomas Hines (Tennessee Tech) Pyjama example 
+ * by Ruth Kurniawati, Westfield State University, July, 2021
  *
  *  Usage: 
  *    make run
  *    make run ARGS="numThreads n"
  *    For example: make run ARGS="4 100" 
- *
  * 
  *  Exercise:
  *  - Build and run, record sequential time in a spreadsheet
- *  - Uncomment #pragma omp parallel for directive, rebuild,
- *     and read the error message carefully.
  *  - Uncomment the #pragma omp declare directive, rebuild,
- *     and note the user-defined * reduction for a BigInt.
+ *     and note the user-defined max function used in the reduction.
  *  - Rerun, using 2, 4, 6, 8, ... threads, recording
  *     the times in the spreadsheet.
  *  - Create a chart that plots the times vs the # of threads.
  *  - Experiment with different n values
  */
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.IntStream;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Reduction2 {
-    static long factorial(int numThreads, int n) {
-        long acc = 1;
-
-        //#omp parallel shared(acc, n) num_threads(numThreads) 
-        {
-            //#omp for reduction(*:acc)
-            for(int i=2; i <= n; i++) {
-                acc *= i;
-            }
-        }
-        return acc;
-    }
 
     public static void main(String[] args) {
-        // check and parse argument
-        int numThreads = Runtime.getRuntime().availableProcessors();
-        if (args.length < 1) {
-            System.out.println("Usage " + Reduction2.class.getName() + " numThreads n.");
-            System.out.println("Using default number of Threads " + numThreads);
-        } else {
+
+        int numThreads = Pyjama.omp_get_num_procs();
+        if (args.length > 1) {
             numThreads = Integer.parseInt(args[0]);
         }
-
-        int n = 20;
-        if (args.length == 2) {
+        int n = 1000000000;
+        if (args.length > 2) {
             n = Integer.parseInt(args[1]);
-            if (n > 20) {
-                System.out.println("n cannot be greater than 20 (overflow will happen)");
-                return;
+        }
+        
+        int max_val = 0;
+        int [] arr = new int[n];
+        for (int i = 0; i < n; i++) 
+            arr[i] = ThreadLocalRandom.current().nextInt(0, 101);
+        
+        //#omp parallel num_threads(numThreads) shared(n, arr) reduction(max:max_val)
+        {
+            //#omp for
+            for (int i = 0; i < n; i++)
+            {
+                if (arr[i] > max_val)
+                    max_val = arr[i];
             }
         }
 
-        long startTime = System.currentTimeMillis();
-        long result = factorial(numThreads, n);
-        long duration = System.currentTimeMillis() - startTime;
-
-        System.out.println("Result = " + result);
-        System.out.println("Time = " + duration + " ms");
+        for (int i = 0; i < n; i++) System.out.print(arr[i] + " ");
+        System.out.println("\nmax value = " + max_val);
     }
 }

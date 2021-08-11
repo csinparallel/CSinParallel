@@ -29,11 +29,11 @@ public class Reduction2 {
     public static void main(String[] args) {
 
         int numThreads = Pyjama.omp_get_num_procs();
-        if (args.length > 1) {
+        if (args.length >= 1) {
             numThreads = Integer.parseInt(args[0]);
         }
         int n = 100000000;
-        if (args.length > 2) {
+        if (args.length >= 2) {
             n = Integer.parseInt(args[1]);
         }
         

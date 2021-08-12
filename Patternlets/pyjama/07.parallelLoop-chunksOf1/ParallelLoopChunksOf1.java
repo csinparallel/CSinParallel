@@ -1,3 +1,5 @@
+import pj.Pyjama;
+
 /* ParallelLoopChunksOf1.java
  * ... illustrates how to make OpenMP map threads to 
  *	parallel loop iterations in chunks of size 1
@@ -37,12 +39,16 @@ class ParallelLoopChunksOf1 {
         /*
         System.out.println("--\n\n");
 
-        //#omp parallel for  
-        for (int i = 0; i < REPS; i++) {
+        //#omp parallel
+        {
+            int numThreads = Pyjama.omp_get_num_threads();
             int id = Pyjama.omp_get_thread_num();
-            System.out.println("Thread "+id+" performed iteration "+i);
+            for (int i = id; i < REPS; i+=numThreads) {
+                System.out.println("Thread "+id+" performed iteration "+i);
+            }
         }
         */
+
         System.out.println();
     }
 }

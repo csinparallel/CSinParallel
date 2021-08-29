@@ -4,3 +4,6 @@
 [submodule "Patternlets/MPI/notebook"]
 	path = Patternlets/MPI/notebook
 	url = https://github.com/rkurniawati/mpiC.git
+[submodule "Patternlets/pyjama"]
+	path = Patternlets/pyjama
+	url = https://github.com/rkurniawati/pyjama-patternlets.git

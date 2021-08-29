@@ -41,7 +41,7 @@ public class DDPyjama {
         // to args.maxLigand
 
         String[] result = new String[numLigands];
-        if (numLigands<=18) {
+        if (numLigands <= cannedLigands.length) {
             for(int i = 0; i < numLigands; i++) {
                 result[i] = cannedLigands[i];
             }
@@ -61,23 +61,23 @@ public class DDPyjama {
         }
 
         int numThreads = 4;
-        if (args.length > 1) {
+        if (args.length >= 1) {
             numThreads = Integer.parseInt(args[0]);
         }
 
         int numLigands = 12;
-        if (args.length > 2) {
+        if (args.length >= 2) {
             numLigands = Integer.parseInt(args[1]);
         }
 
         int maxLigandLength = 6;
-        if (args.length > 3) {
+        if (args.length >= 3) {
             maxLigandLength = Integer.parseInt(args[2]);
         }
 
         String protein = "the cat in the hat wore the hat to the cat hat party";
 
-        if (args.length > 4) {
+        if (args.length >= 4) {
             protein = args[3];
         }
 

@@ -70,7 +70,7 @@ public class DDPyjama {
             numLigands = Integer.parseInt(args[1]);
         }
 
-        int maxLigandLength = 7;
+        int maxLigandLength = 6;
         if (args.length > 3) {
             maxLigandLength = Integer.parseInt(args[2]);
         }
@@ -81,6 +81,12 @@ public class DDPyjama {
             protein = args[3];
         }
 
+        System.out.println("Number of threads: " + numThreads);
+        System.out.println("Number of ligans: "+numLigands);
+        System.out.println("Max ligand length: "+ maxLigandLength);
+        System.out.println("Protein: "+ protein);
+
+
         // Things to do: 
         // 1. Generate the requested numLigands w/ maxLigandLength
         // 2. Calculate the matching score for each ligand vs the given protein
@@ -88,15 +94,19 @@ public class DDPyjama {
         //    appears in the same order in the protein. 
         // 3. Find the ligand(s) with the highest score
 
-        String ligands[] = generateLigands(numLigands, maxLigandLength);
+        long start = System.currentTimeMillis();
+        String[] ligands = generateLigands(numLigands, maxLigandLength);
 
         // map each ligand to (ligand, score)
         // also keep track of the maxScore 
         LSPair[] ligandsWScore = new LSPair[numLigands];
         int maxScore = 0;
+
+        //#omp parallel for num_threads(numThreads) shared(numLigands, ligands, ligandsWScore, protein) reduction(max:maxScore) schedule(dynamic)
         for(int i = 0; i < numLigands; i++) {
-            int score = calcScore(ligands[i], protein);
-            ligandsWScore[i] = new LSPair(ligands[i], score);
+            String ligand = ligands[i];
+            int score = calcScore(ligand, protein);
+            ligandsWScore[i] = new LSPair(ligand, score);
             maxScore = Math.max(maxScore, score);
         }
 
@@ -110,9 +120,10 @@ public class DDPyjama {
             }
         }
 
+        long end = System.currentTimeMillis();
         System.out.println("The maximum score is " + maxScore);
         System.out.println("Achieved by ligand(s) "+ sb.toString());
-
+        System.out.println("Calculation time " + (end-start) + " ms");
     }
 
     /**

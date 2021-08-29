@@ -23,8 +23,10 @@ Pyjama.jar:
 	cp Pyjama/Pyjama*.jar Pyjama.jar
 	rm -r -f Pyjama.zip Pyjama
 
-DDPyjama:	DDPyjama.java Pyjama.jar
+DDPyjama.class:	DDPyjama.java Pyjama.jar
 	java -jar Pyjama.jar DDPyjama.java
+
+DDPyjama:	DDPyjama.class
 	java -cp .:Pyjama.jar DDPyjama $(ARGS)
 
 clean:

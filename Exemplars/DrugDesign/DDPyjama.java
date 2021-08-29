@@ -82,10 +82,10 @@ public class DDPyjama {
         }
 
         System.out.println("Number of threads: " + numThreads);
-        System.out.println("Number of ligans: "+numLigands);
+        System.out.println("Number of ligands: "+numLigands);
         System.out.println("Max ligand length: "+ maxLigandLength);
         System.out.println("Protein: "+ protein);
-
+        System.out.println();
 
         // Things to do: 
         // 1. Generate the requested numLigands w/ maxLigandLength

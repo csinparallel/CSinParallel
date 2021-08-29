@@ -17,6 +17,16 @@ dd_threads: dd_threads.cpp
 dd_mpi:  dd_mpi.cpp
 	mpiCC -std=c++11 -o dd_mpi dd_mpi.cpp
 
+Pyjama.jar:
+	wget https://www.csc.tntech.edu/pdcincs/resources/modules/tools/updated/Pyjama.zip
+	unzip -o Pyjama.zip
+	cp Pyjama/Pyjama*.jar Pyjama.jar
+	rm -r -f Pyjama.zip Pyjama
+
+DDPyjama:	DDPyjama.java Pyjama.jar
+	java -jar Pyjama.jar DDPyjama.java
+	java -cp .:Pyjama.jar DDPyjama $(ARGS)
+
 clean:
-	rm -f dd_serial dd_omp_static dd_omp_dynamic dd_threads dd_mpi
+	rm -f dd_serial dd_omp_static dd_omp_dynamic dd_threads dd_mpi Pyjama.jar DDPyjama*class
 

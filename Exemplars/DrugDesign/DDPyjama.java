@@ -35,19 +35,21 @@ public class DDPyjama {
         return sb.toString();
     }
   
-    private static String[] generateLigands(int numLigands, int maxLigandLength) {
+    private static String[] generateLigands(int numLigands, int maxLigandLength, boolean useCanned) {
         // If numLigands <=18, create a pre-determined set of example ligands.
         // Otherwise, create a set of ligands whose length randomly varies from 2
         // to args.maxLigand
 
         String[] result = new String[numLigands];
-        if (numLigands <= cannedLigands.length) {
+
+        if (useCanned && numLigands <= cannedLigands.length) {
             for(int i = 0; i < numLigands; i++) {
                 result[i] = cannedLigands[i];
             }
             return result;
 
         }
+
         for(int i = 0; i < numLigands; i++) {
             result[i] = makeLigand(maxLigandLength);
         }
@@ -57,7 +59,10 @@ public class DDPyjama {
     public static void main(String[] args) {
 
         if (args.length != 4) {
-            System.out.println("Usage DDPyjama numThreads numLigands maxLigandLength protein");
+            System.out.println("Usage DDPyjama numThreads numLigands maxLigandLength protein useCanned printLigands");
+
+            // the example string below is one of Dijkstra's famous quotes
+            System.out.println("   Example: java DDPyjama 4 10 8 \"Simplicity is a great virtue but it requires hard work to achieve it and education to appreciate it\" false true\n");
         }
 
         int numThreads = 4;
@@ -95,8 +100,16 @@ public class DDPyjama {
         // 3. Find the ligand(s) with the highest score
 
         long start = System.currentTimeMillis();
-        String[] ligands = generateLigands(numLigands, maxLigandLength);
+        String[] ligands = generateLigands(numLigands, maxLigandLength, args.length >= 5 && args[4].equals("true"));
 
+        // print the ligands if desired
+        if (args.length >= 6 && args[5].equals("true")) {
+            System.out.println("Here are the ligands");
+            for(String l : ligands) {
+                System.out.println(l);
+            }
+        }
+        
         // map each ligand to (ligand, score)
         // also keep track of the maxScore 
         LSPair[] ligandsWScore = new LSPair[numLigands];

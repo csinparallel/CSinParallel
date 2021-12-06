@@ -6,7 +6,7 @@ public class DDPyjama {
     static String[] cannedLigands = 
         {"razvex", "qudgy", "afrs", "sst", "pgfht", "rt", 
         "id", "how", "aaddh",  "df", "os", "hid", 
-        "sad", "fl", "rd", "edp", "dfgt", "spa", "qdsayjbp", "zunerd"};
+        "sad", "fl", "rd", "edp", "dfgt", "spa"};
 
     // Ligand Score pair
     static class LSPair {

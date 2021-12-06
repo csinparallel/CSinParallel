@@ -36,21 +36,19 @@ public class DDPyjama {
     }
   
     private static String[] generateLigands(int numLigands, int maxLigandLength, boolean useCanned) {
-        // If numLigands <=18, create a pre-determined set of example ligands.
-        // Otherwise, create a set of ligands whose length randomly varies from 2
+        // If numLigands <=cannedLigands.length, create a pre-determined set of example ligands.
+        // Otherwise, create a set of ligands whose length randomly varies from 1
         // to args.maxLigand
 
         String[] result = new String[numLigands];
 
-        if (useCanned && numLigands <= cannedLigands.length) {
-            for(int i = 0; i < numLigands; i++) {
+        if (useCanned) {
+            for(int i = 0; i < Math.min(numLigands, cannedLigands.length); i++) {
                 result[i] = cannedLigands[i];
             }
-            return result;
-
         }
 
-        for(int i = 0; i < numLigands; i++) {
+        for(int i = useCanned ? cannedLigands.length : 0; i < numLigands; i++) {
             result[i] = makeLigand(maxLigandLength);
         }
         return result;

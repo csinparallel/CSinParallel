@@ -36,9 +36,8 @@ public class DDPyjama {
     }
   
     private static String[] generateLigands(int numLigands, int maxLigandLength, boolean useCanned) {
-        // If numLigands <=cannedLigands.length, create a pre-determined set of example ligands.
-        // Otherwise, create a set of ligands whose length randomly varies from 1
-        // to args.maxLigand
+        // If we use canned ligands, use as many of them as we can, then fill the rest with randomly generated ligands. 
+        // Otherwise, create a set of ligands whose length randomly varies from 1 to args.maxLigand
 
         String[] result = new String[numLigands];
 

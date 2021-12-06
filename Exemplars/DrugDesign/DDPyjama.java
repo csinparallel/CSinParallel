@@ -59,7 +59,7 @@ public class DDPyjama {
             System.out.println("Usage DDPyjama numThreads numLigands maxLigandLength protein useCanned printLigands");
 
             // the example string below is one of Dijkstra's famous quotes
-            System.out.println("   Example: java DDPyjama 4 10 8 \"Simplicity is a great virtue but it requires hard work to achieve it and education to appreciate it\" false true\n");
+            System.out.println("   Example: java -cp .:Pyjama.jar DDPyjama 4 10 8 \"Simplicity is a great virtue but it requires hard work to achieve it and education to appreciate it\" false true\n");
         }
 
         int numThreads = 4;

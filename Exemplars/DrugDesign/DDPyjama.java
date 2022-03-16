@@ -28,6 +28,7 @@ public class DDPyjama {
     static String makeLigand(int maxLigandLength) {
 
         int len = rand.nextInt(maxLigandLength+1);
+        if (len == 0) len++; // don't create a 0-character ligand
         
         StringBuilder sb = new StringBuilder();
         for (int i = 0;  i < len;  i++) 

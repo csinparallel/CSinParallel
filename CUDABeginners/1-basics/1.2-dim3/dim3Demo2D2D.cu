@@ -1,3 +1,5 @@
+/* demo program for 2D grid with 2D blocks */
+
 #include <stdio.h>
 
 // CUDA runtime
@@ -9,7 +11,8 @@ __global__ void hello() {
     // blockIdx    the x, y, z coordinate of the block in the grid
     // threadIdX   the x, y, z coordinate of the thread in the block
     printf("I am thread (%d, %d, %d) of block (%d, %d, %d) in the grid\n",
-           threadIdx.x, threadIdx.y, threadIdx.z, blockIdx.x, blockIdx.y, blockIdx.z );
+           threadIdx.x, threadIdx.y, threadIdx.z, 
+           blockIdx.x, blockIdx.y, blockIdx.z );
 
 }
 
@@ -30,7 +33,7 @@ int main(int argc, char **argv) {
     // each integer is accessed using .x, .y and .z (see printDims() above)
 
     // 2D dimensionsional case is the following: 
-    // 1D grid of 2D blocks
+    // 2D grid of 2D blocks
     dim3 gridDim(2,2);     // 2 blocks in x direction, y, z default to 1
     dim3 blockDim(2,2);  // 4 threads per block: 2 in x direction, 2 in y
     // TODO: change to 8 threads per block: 4 in x direction, 2 in y

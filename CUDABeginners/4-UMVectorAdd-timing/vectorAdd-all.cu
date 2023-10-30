@@ -1,13 +1,13 @@
 //
 // Demonstration using a single 1D grid and 
-// 1, or more 1D blocks of optional size
+// 0, 1, or more 1D blocks of optional size
 //
 /*
  * Example of vector addition :
  * Array of floats x is added to array of floats y and the 
  * result is placed back in y
  *
- * Timing added for analysis of block size differences.
+ * Timng added for analysis of block size differences.
  */
 
 #include <math.h>
@@ -36,6 +36,22 @@ void checkBlocksize(int * blockSize);
         } \
     } while (0)
 
+
+// To run code on host for comparison
+void HostAdd(int n, float *x, float *y)
+{
+  for (int i = 0; i < n; i++)
+    y[i] = x[i] + y[i];
+}
+
+// Kernel function to add the elements of two arrays
+// This one is sequential on one GPU core.
+__global__
+void add(int n, float *x, float *y)
+{
+  for (int i = 0; i < n; i++)
+    y[i] = x[i] + y[i];
+}
 
 // Parallel version that uses threads in the block.
 //
@@ -99,11 +115,12 @@ int main(int argc, char **argv)
   printf("This program lets us experiment with the number of blocks and the \n");
   printf("number of threads per block to see its effect on running time.\n");
   printf("\nUsage:\n");
-  printf("%s [num threads per block] [array_size]\n", argv[0]);
-  printf("\nwhere you can specify the number of threads per block \n");
-  printf("and the array size\n");
+  printf("%s [num threads per block] [array_size]\n\n", argv[0]);
+  printf("\nwhere you can specify only the number of threads per block \n");
+  printf("and the number of blocks will be calculated based on the size\n");
+  printf("of the array.\n\n");
 
-  // Set up the deafult size of arrays
+  // Set up size of arrays
   // multiple of 1024 to match largest threads per block 
   // allowed in many NVIDIA GPUs
   //
@@ -117,10 +134,10 @@ int main(int argc, char **argv)
   checkBlocksize(&blockSize);
 
   printf("size (N) of 1D array is: %d\n\n", N);
-  // Size, in bytes, of each vector; use just below
+  // Size, in bytes, of each vector; just use below
   size_t bytes = N*sizeof(float);
 
-  // Allocate Unified Memory - accessible from CPU or GPU
+  // Allocate Unified Memory – accessible from CPU or GPU
   cudaMallocManaged(&x, bytes);
   cudaMallocManaged(&y, bytes);
   cudaCheckErrors("allocate managed memory");
@@ -132,8 +149,44 @@ int main(int argc, char **argv)
   double tot_time_secs;
   double tot_time_milliseconds;
   
-  ///////////////////////////////////////////////////////////////
-  // case 3: using a single block of threads
+  ///////////////////////////////////////////////////////////////////
+  // case 1: run on the host on one core
+  t_start = clock();
+  // sequentially on the host
+  HostAdd(N, x, y);
+  t_end = clock();
+  tot_time_secs = ((double)(t_end-t_start)) / CLOCKS_PER_SEC;
+  tot_time_milliseconds = tot_time_secs*1000;
+  printf("\nSequential time on host: %f seconds (%f milliseconds)\n", tot_time_secs, tot_time_milliseconds);
+ 
+  verifyCorrect(y, N);
+  
+  ///////////////////////////////////////////////////////////////////
+  // case 2:
+  // Purely illustration of something you do not ordinarilly do:
+  // Run kernel on all elements on the GPU sequentially on one thread
+  
+  // re-initialize
+   initialize(x, y, N);
+
+  t_start = clock();
+
+  add<<<1, 1>>>(N, x, y);   // the kernel call
+  cudaCheckErrors("add kernel call");
+
+  // Wait for GPU to finish before accessing on host
+  cudaDeviceSynchronize();
+  cudaCheckErrors("Failure to synchronize device");
+  
+  t_end = clock();
+  tot_time_secs = ((double)(t_end-t_start)) / CLOCKS_PER_SEC;
+  tot_time_milliseconds = tot_time_secs*1000;
+  printf("\nSequential time on one device thread: %f seconds (%f milliseconds)\n", tot_time_secs, tot_time_milliseconds);
+ 
+  verifyCorrect(y, N);
+
+  ///////////////////////////////////////////////////////////////////
+  // case 3: using a single block of 256 threads
   // re-initialize x and y arrays on the host
   initialize(x, y, N);
 
@@ -153,7 +206,7 @@ int main(int argc, char **argv)
   tot_time_secs = ((double)(t_end-t_start)) / CLOCKS_PER_SEC;
   tot_time_milliseconds = tot_time_secs*1000;
 
-  printf("\nCase 3: Parallel time on 1 block of %d threads: %f milliseconds\n",
+  printf("\nParallel time on 1 block of %d threads: %f milliseconds\n",
          blockSize, tot_time_milliseconds);
   
   verifyCorrect(y, N);
@@ -185,13 +238,13 @@ int main(int argc, char **argv)
   t_end = clock();
   tot_time_secs = ((double)(t_end-t_start)) / CLOCKS_PER_SEC;
   tot_time_milliseconds = tot_time_secs*1000;
-  printf("Case 4: Stride loop pattern: \n");
+  printf("Stride loop pattern: \n");
   printf("Parallel time on %d blocks of %d threads = %f milliseconds\n", gridSize, blockSize, tot_time_milliseconds);
 
   verifyCorrect(y, N);
 
   //////////////////////////////////////////////////////////////////
-  // case 5: without using stride
+  // case 5: withot using stride
   //
   // re-initialize x and y arrays on the host
   initialize(x, y, N);
@@ -213,7 +266,7 @@ int main(int argc, char **argv)
   t_end = clock();
   tot_time_secs = ((double)(t_end-t_start)) / CLOCKS_PER_SEC;
   tot_time_milliseconds = tot_time_secs*1000;
-  printf("Case 5: No stride loop pattern: \n");
+  printf("No stride loop pattern: \n");
   printf("Parallel time on %d blocks of %d threads = %f milliseconds\n", gridSize, blockSize, tot_time_milliseconds);
 
   verifyCorrect(y, N);
@@ -275,3 +328,4 @@ void checkBlocksize(int * blockSize) {
     printf("WARNING: using %d threads per block, which is the maximum.", *blockSize);
   }
 }
+

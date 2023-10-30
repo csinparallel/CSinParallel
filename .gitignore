@@ -1,3 +1,22 @@
 #vs-code stuff
 .vscode
 sftp.json
+
+vectorAdd-1
+vectorAdd-all
+vectorAdd
+vectorAdd_cudaTiming
+
+
+device_info
+dim3Demo
+dim3Demo1D1D
+dim3Demo1D2D
+dim3Demo2D2D
+print1Block
+print2Blocks
+printThreads-to-2DArray
+
+mm-omp
+mm-serial
+mm-um

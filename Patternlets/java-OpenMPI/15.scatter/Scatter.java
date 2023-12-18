@@ -30,7 +30,7 @@ public class Scatter {
     int numProcesses  = comm.getSize();
 
     if (numProcesses > BUFFER_SIZE) {
-        if (id == MASTER) {
+        if (id == CONDUCTOR) {
             System.out.println("\nPlease run this program with N <= 8 processes\n");
         }
         MPI.Finalize();
@@ -39,7 +39,7 @@ public class Scatter {
     IntBuffer sendBuf = null;
     IntBuffer recvBuf = null;
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         sendBuf = MPI.newIntBuffer(BUFFER_SIZE);
         for (int i = 0; i < BUFFER_SIZE; ++i) {
            sendBuf.put(i, (i+1) * 11);
@@ -58,15 +58,15 @@ public class Scatter {
     printSeparator("----", id);
 
     comm.scatter(sendBuf, numSent, MPI.INT, 
-                  recvBuf, numSent, MPI.INT, MASTER); 
+                  recvBuf, numSent, MPI.INT, CONDUCTOR); 
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         System.out.print("After scatter:\n");
     }
     comm.barrier();                    // all of these barriers are here
     printBuf(id, "recvBuf", recvBuf);  //  just to make the output easier
     comm.barrier();                    //  to read; no effect on correctness
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         System.out.println();
     }
 
@@ -96,15 +96,15 @@ public class Scatter {
   /* utility to print a separator between before and after sections.
    * @param: separator, a String.
    * @param: id, the MPI rank of this process. 
-   * POST: separator has been printed by the master process.
+   * POST: separator has been printed by the conductor process.
    */
   private static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.print(separator + "\n"); }
+     if (id == CONDUCTOR) { System.out.print(separator + "\n"); }
      MPI.COMM_WORLD.barrier();
   }
 
   private static int BUFFER_SIZE = 8;
-  private static int MASTER      = 0;
+  private static int CONDUCTOR      = 0;
 }
 

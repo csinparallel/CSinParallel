@@ -2,7 +2,7 @@
  * ... illustrates the use of MPI's broadcast command with a scalar value.
  * This version uses an array of length 1 to store the scalar value.
  *
- * Goal: The master process reads an 'answer' value from a file
+ * Goal: The conductor process reads an 'answer' value from a file
  *        and broadcasts it to all the other processes.
  *       Each process outputs its 'answer' value before and after
  *        the broadcast.
@@ -34,7 +34,7 @@ public class Broadcast {
 
     int [] answer = new int[1]; 
 
-    if ( id == MASTER ) {                 // MASTER: read data from file
+    if ( id == CONDUCTOR ) {                 // CONDUCTOR: read data from file
         answer[0] = readAnswerFromFile("data.txt");
     }
 
@@ -42,7 +42,7 @@ public class Broadcast {
                        + "'s answer is: " + answer[0] + "\n";
     System.out.print(beforeMsg);
 
-    if ( id == MASTER) {                 // MASTER: separate before from after
+    if ( id == CONDUCTOR) {                 // CONDUCTOR: separate before from after
         System.out.println("----");
     }
 
@@ -83,6 +83,6 @@ public class Broadcast {
         return intValue;
     } 
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
 }
 

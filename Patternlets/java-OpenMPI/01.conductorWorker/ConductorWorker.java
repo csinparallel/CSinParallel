@@ -1,11 +1,11 @@
-/* MasterWorker.java
- * ... illustrates the master-worker pattern
+/* ConductorWorker.java
+ * ... illustrates the conductor-worker pattern
  *      using basic MPI commands
  *      and OpenMPI's Java interface.
  *
  * Joel Adams, Calvin University, November 2019.
  *
- * Usage: mpirun -np 4 java ./MasterWorker
+ * Usage: mpirun -np 4 java ./ConductorWorker
  *
  * Exercise:
  * - Compile and run the program, varying N from 1 through 8.
@@ -15,9 +15,9 @@
 
 import mpi.*;
 
-public class MasterWorker {
+public class ConductorWorker {
 
- public static final int MASTER = 0;
+ public static final int CONDUCTOR = 0;
 
  public static void main(String [] args) throws MPIException {
     MPI.Init(args);
@@ -27,8 +27,8 @@ public class MasterWorker {
     String hostName  = MPI.getProcessorName();
     String message   = "Greetings from ";
 
-    if (id == MASTER) {
-       message += "the master, #" + id
+    if (id == CONDUCTOR) {
+       message += "the conductor, #" + id
                    + " (" + hostName + ")"
                    + " of " + numProcesses + "\n";
     } else {

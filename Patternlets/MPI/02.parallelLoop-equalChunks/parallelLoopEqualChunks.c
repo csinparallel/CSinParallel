@@ -25,22 +25,30 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &id);
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
 
-    // In this example, ensure that the REPS can ben evenly divided by the
-    // number of processors and that the number of processes doesn't exceed REPS.
-    // If either is the case, stop.
-    if ((REPS % numProcesses) == 0 && numProcesses <= REPS) {
+    // In this example, ensure that the number of processes doesn't exceed REPS.
+    if (numProcesses <= REPS) {
+      int chunkSize = REPS / numProcesses;      // find minimum chunk size
+      int extra = REPS % numProcesses;     // spread one more to this many processes
+      int firstLargerId = numProcesses - extra;  // first proc getting chunkSuze + 1
 
-      int chunkSize = REPS / numProcesses;      // find chunk size
-      int start = id * chunkSize;               // find starting index
-      int stop = start + chunkSize;             // find stopping index
+      int start = 0; // start index in loop for my process
+      int stop = 0;  // end index of loop for my process
+
+      if (id < firstLargerId) {    // these processes get chunkSize steps
+        start = id * chunkSize;     // skip by chunkSize unless I'm process 0
+        stop = start + chunkSize;        
+      } else {                      // these get chunksize + 1 steps
+        start = (firstLargerId * chunkSize) + ((id - firstLargerId) * (chunkSize + 1));   
+        stop = start + chunkSize + 1;  
+      }
 
       for (int i = start; i < stop; i++) {      // iterate through our range
           printf("Process %d is performing iteration %d\n", id, i);
       }
 
-    } else {
+    } else {  // more processes than REPS
       if (id == 0) {
-          printf("Please run with -np divisible by and less than or equal to %d\n.", REPS);
+          printf("Please run with -np less than or equal to %d\n.", REPS);
       }
     }
 

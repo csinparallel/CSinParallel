@@ -72,7 +72,7 @@ void printArray(int id, char* arrayName, int * array, int SIZE) {
 /* utility to print a separator string between before and after sections.
  * params: separator, a string
  *         id, the rank of the current process.
- * postcondition: the master process has printed the separator.
+ * postcondition: the conductor process has printed the separator.
  */
 void printSeparator(char* separator, int id) {
     MPI_Barrier(MPI_COMM_WORLD);

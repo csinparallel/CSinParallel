@@ -39,7 +39,7 @@ public class Barrier {
     MPI.Finalize();
   }
 
-  /* Have workers send messages to the master, which prints them.
+  /* Have workers send messages to the conductor, which prints them.
    * @param: id, an int
    * @param: numProcesses, an int
    * @param: hostName, a char*
@@ -62,13 +62,13 @@ public class Barrier {
                                          throws MPIException
   {
       CharBuffer buffer = MPI.newCharBuffer(BUF_SIZE);
-      if ( id != MASTER ) {     // Workers: build & send a message to the Master
+      if ( id != CONDUCTOR ) {     // Workers: build & send a message to the Conductor
           String msg = "Process " + id + " of " + numProcesses
                        + " on " + hostName + " is " + position
                        + " the barrier.";
           buffer.put(msg);
           MPI.COMM_WORLD.send(buffer, msg.length(), MPI.CHAR, 0, 0);
-      } else {                  // Master: recv & print msg from each Worker
+      } else {                  // Conductor: recv & print msg from each Worker
           for (int i = 1; i < numProcesses; ++i) {
               MPI.COMM_WORLD.recv(buffer, BUF_SIZE, MPI.CHAR,
                                    MPI.ANY_SOURCE, MPI.ANY_TAG);
@@ -78,6 +78,6 @@ public class Barrier {
   }
 
   private static final int BUF_SIZE = 128;
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
 }
 

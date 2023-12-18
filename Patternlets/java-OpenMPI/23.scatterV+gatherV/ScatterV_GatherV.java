@@ -5,10 +5,10 @@
  *
  * Joel Adams, Calvin University, December 2019.
  *
- * Goal: The master process fills a buffer with values
+ * Goal: The conductor process fills a buffer with values
  *        and scatters it to all the other processes.
  *       Each process doubles the values in its buffer-chunk.
- *       All processes then gather the chunks back to the master.
+ *       All processes then gather the chunks back to the conductor.
  *
  * Note: Using scatterv and gatherv eliminates the constraint
  *        that BUFFER_SIZE needs to be evenly divisible by N.
@@ -46,7 +46,7 @@ public class ScatterV_GatherV {
     IntBuffer scatterBuffer = null;
     IntBuffer gatherBuffer  = null;
 
-    if ( id == MASTER ) {                                // master allocates buffers,
+    if ( id == CONDUCTOR ) {                                // conductor allocates buffers,
         scatterBuffer = MPI.newIntBuffer(BUFFER_SIZE);   //  fills scatterBuffer
         fill(scatterBuffer);
         gatherBuffer = MPI.newIntBuffer(BUFFER_SIZE);
@@ -76,7 +76,7 @@ public class ScatterV_GatherV {
     printBuffers("BEFORE the scatterv", id, scatterBuffer, chunkBuffer, gatherBuffer);
                                                          // scatter varying-sized chunks
     comm.scatterv(scatterBuffer, chunkSizeArray, offsetArray, MPI.INT, 
-                  chunkBuffer, chunkSize, MPI.INT, MASTER);
+                  chunkBuffer, chunkSize, MPI.INT, CONDUCTOR);
 
     printSeparator("----", id);
     printBuffers("AFTER the scatterv", id, scatterBuffer, chunkBuffer, gatherBuffer);
@@ -87,7 +87,7 @@ public class ScatterV_GatherV {
     printBuffers("AFTER the doubling", id, scatterBuffer, chunkBuffer, gatherBuffer);
 
     comm.gatherv(chunkBuffer, chunkSize, MPI.INT,      // gather varying-sized chunks
-                 gatherBuffer, chunkSizeArray, offsetArray, MPI.INT, MASTER);
+                 gatherBuffer, chunkSizeArray, offsetArray, MPI.INT, CONDUCTOR);
 
     printSeparator("----", id);                        // display results
     printBuffers("AFTER the gatherv", id, scatterBuffer, chunkBuffer, gatherBuffer);
@@ -108,7 +108,7 @@ public class ScatterV_GatherV {
   /* utility to print a buffer with labels.
    * @param: label, a String.
    * @param: id, an int containing the MPI rank of this process.
-   * @param: sBuf, the IntBuffer the master fills and scatters.
+   * @param: sBuf, the IntBuffer the conductor fills and scatters.
    * @param: cBuf, the IntBuffer for storing a process's chunk.
    * @param: gBuf, the IntBuffer for storing the gathered results.
    * POST: The buffers' contents have been printed, with labels.
@@ -159,15 +159,15 @@ public class ScatterV_GatherV {
   /* utility to print a separator string between the 'before' and 'after' parts.
    * @param: separator, a String.
    * @param: id, the rank of this MPI process.
-   * POST: the master has printed the separator to System.out.
+   * POST: the conductor has printed the separator to System.out.
    */
   public static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      MPI.COMM_WORLD.barrier();
   }
 
-  private static final int MASTER      = 0;
+  private static final int CONDUCTOR      = 0;
   private static final int BUFFER_SIZE = 8;
 }
 

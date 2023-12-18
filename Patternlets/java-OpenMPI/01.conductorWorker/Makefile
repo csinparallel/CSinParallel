@@ -1,4 +1,4 @@
-PROG  = MasterWorker
+PROG  = ConductorWorker
 CLASS = $(PROG).class
 SRC   = $(PROG).java
 CC    = mpijavac

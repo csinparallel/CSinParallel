@@ -34,7 +34,7 @@ public class BarrierPlusTiming {
 
 //    comm.barrier();
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         startTime = MPI.wtime();
     }
  
@@ -42,7 +42,7 @@ public class BarrierPlusTiming {
 
 //    comm.barrier();
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         totalTime = MPI.wtime() - startTime;
         String answerStr = "\nThe answer is " + answer
                            + ", computing it took "
@@ -72,6 +72,6 @@ public class BarrierPlusTiming {
       return 42;
   }
 
-  private static int MASTER = 0;
+  private static int CONDUCTOR = 0;
 }
 

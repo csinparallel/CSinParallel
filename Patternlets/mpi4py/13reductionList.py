@@ -43,7 +43,7 @@ def main():
     destListSum = comm.reduce(srcList, op=MPI.SUM)
     #destListSumByElement = comm.reduce(srcList, op=sumListByElements)
 
-    if id == 0:        # master/root process will print result
+    if id == 0:        # conductor/root process will print result
         print("The resulting reduce max list is  {}".format(destListMax))
         print("The resulting reduce sum list is  {}".format(destListSum))
         #print("The resulting reduce sum list is  {}".format(destListSumByElement))

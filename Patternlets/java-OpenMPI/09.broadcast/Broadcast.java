@@ -3,7 +3,7 @@
  *
  * Note: This version uses an IntBuffer of length 1 to store the scalar.
  *
- * Goal: The master process reads an 'answer' value from a file
+ * Goal: The conductor process reads an 'answer' value from a file
  *        and broadcasts it to all the other processes.
  *       Each process outputs its 'answer' value before and after
  *        the broadcast.
@@ -36,7 +36,7 @@ public class Broadcast {
 
     IntBuffer answerBuf = MPI.newIntBuffer(1);
 
-    if ( id == MASTER ) {                      // MASTER: read data from file
+    if ( id == CONDUCTOR ) {                      // CONDUCTOR: read data from file
         int answer = readAnswerFromFile("data.txt");
         answerBuf.put(answer);
     }
@@ -87,14 +87,14 @@ public class Broadcast {
   /* utility to print a separator string between the 'before' and 'after' parts.
    * @param: separator, a String.
    * @param: id, the rank of this MPI process.
-   * POST: the master has printed the separator to System.out.
+   * POST: the conductor has printed the separator to System.out.
    */
   public static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      MPI.COMM_WORLD.barrier();
   }
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
 }
 

@@ -1,5 +1,5 @@
 /* taskQueue.c
- * ... illustrates how to use the Master-Worker and Task Queue
+ * ... illustrates how to use the Conductor-Worker and Task Queue
  *     patterns to achieve dynamic load balancing.
  * This code is based on the dynamicLoadBalance.py script,
  * that was written by Libby Shoop (Macalester College)
@@ -20,7 +20,7 @@
 #include <unistd.h>   // usleep()
 #include <mpi.h>      // MPI functions
 
-const int MASTER        = 0;
+const int CONDUCTOR        = 0;
 const int WORK_TAG      = 0;
 const int DONE_TAG      = 1;
 
@@ -40,12 +40,12 @@ int* generateQueue(int numTasks) {
     for (int i = 0; i < numTasks; ++i) {  // fill the array 
         taskQ[i] = (rand() % (MAX_TASK_TIME - MIN_TASK_TIME + 1)) 
                     + MIN_TASK_TIME;
-        printf("Master: added task %d to queue\n", taskQ[i]);
+        printf("Conductor: added task %d to queue\n", taskQ[i]);
     }
     return taskQ;
 }
 
-/* procedure used by the Master to hand out tasks...
+/* procedure used by the Conductor to hand out tasks...
  * @param: taskQ, an array of integer times
  * @param: numTasks, the length of the array
  * @param: numProcs, the number of MPI processes
@@ -61,7 +61,7 @@ void handOutTasks(int* taskQ, int numTasks, int numProcs) {
     unsigned int taskTime = -1;
     MPI_Status msgStatus;
 
-    printf("Master: sending initial %d tasks\n", numProcs - 1);
+    printf("Conductor: sending initial %d tasks\n", numProcs - 1);
     for (int id = 1; id < numProcs; ++id) {
         task = taskQ[taskCount++];
         MPI_Send(&task, 1, MPI_INT, id, WORK_TAG, MPI_COMM_WORLD);
@@ -71,7 +71,7 @@ void handOutTasks(int* taskQ, int numTasks, int numProcs) {
         MPI_Recv(&taskTime, 1, MPI_INT, MPI_ANY_SOURCE,
                    WORK_TAG, MPI_COMM_WORLD, &msgStatus);
         workerID = msgStatus.MPI_SOURCE;
-        printf("Master: received %d from worker %d\n", taskTime, workerID);
+        printf("Conductor: received %d from worker %d\n", taskTime, workerID);
         ++recvCount;
         task = taskQ[taskCount++];
         MPI_Send(&task, 1, MPI_INT, workerID, WORK_TAG, MPI_COMM_WORLD);
@@ -81,24 +81,24 @@ void handOutTasks(int* taskQ, int numTasks, int numProcs) {
         MPI_Recv(&taskTime, 1, MPI_INT, MPI_ANY_SOURCE,
                    WORK_TAG, MPI_COMM_WORLD, &msgStatus);
         workerID = msgStatus.MPI_SOURCE;
-        printf("Master: received %d from worker %d\n", taskTime, workerID);
+        printf("Conductor: received %d from worker %d\n", taskTime, workerID);
         ++recvCount;
     }
 
     for (int id = 1; id < numProcs; ++id) {
         task = 0;
         MPI_Send(&task, 1, MPI_INT, id, DONE_TAG, MPI_COMM_WORLD);
-        printf("Master: sent 'done' message to worker %d\n", id);
+        printf("Conductor: sent 'done' message to worker %d\n", id);
     }
-    printf("Master: terminating normally\n");
+    printf("Conductor: terminating normally\n");
 }
 
 /* procedure performed by Worker processes
  * @param: id, the process's MPI rank
- * @POST: 1 or more tasks have been received from the Master process
+ * @POST: 1 or more tasks have been received from the Conductor process
  *        && performing that task has been simulated 
- *        && a response has been sent to the Master
- *        && a 'done' message has been received from the Master.
+ *        && a response has been sent to the Conductor
+ *        && a 'done' message has been received from the Conductor.
  */
 void performWork(int id) {
     unsigned int taskTime = 0;
@@ -106,15 +106,15 @@ void performWork(int id) {
     MPI_Status msgStatus;
 
     while (!done) {
-        MPI_Recv(&taskTime, 1, MPI_INT, MASTER,
+        MPI_Recv(&taskTime, 1, MPI_INT, CONDUCTOR,
                    MPI_ANY_TAG, MPI_COMM_WORLD, &msgStatus);
         int tag = msgStatus.MPI_TAG;
         if (tag != DONE_TAG) {
-            printf("Worker %d: received %d from Master\n", id, taskTime);
+            printf("Worker %d: received %d from Conductor\n", id, taskTime);
 
             usleep(taskTime);      // simulate performing the task
-                                   // then notify the Master
-            MPI_Send(&taskTime, 1, MPI_INT, MASTER, WORK_TAG, MPI_COMM_WORLD);
+                                   // then notify the Conductor
+            MPI_Send(&taskTime, 1, MPI_INT, CONDUCTOR, WORK_TAG, MPI_COMM_WORLD);
         } else {
             done = 1;
         }
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
     MPI_Comm_rank(MPI_COMM_WORLD, &id);
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         int numTasks = (numProcesses - 1) * 4;
         taskQueue = generateQueue(numTasks);
         handOutTasks(taskQueue, numTasks, numProcesses);

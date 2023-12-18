@@ -1,6 +1,6 @@
 #
 #    Illustrates scatter list of lists of computed values created
-#    in the master process.
+#    in the conductor process.
 #
 #  Libby Shoop, Macalester College, July 2019
 #
@@ -40,7 +40,7 @@ def main():
 
     # in mpi4py, the lowercase scatter method only works on lists whose size
     # is the total number of processes.
-    numElements = numProcesses      #total elements in list created by master process
+    numElements = numProcesses      #total elements in list created by conductor process
 
     # however, the list can contain lists, like this list of 3-element lists,
     # for example this list of four 3-element lists:
@@ -48,7 +48,7 @@ def main():
 
     if id == 0:
         data = genListOfLists(numElements)
-        print("Master {} of {} on {} has created list: {}"\
+        print("Conductor {} of {} on {} has created list: {}"\
         .format(id, numProcesses, myHostName, data))
     else:
         data = None
@@ -62,7 +62,7 @@ def main():
     .format(id, numProcesses, myHostName, result))
 
     if id == 0:
-        print("Master {} of {} on {} has original list after scatter: {}"\
+        print("Conductor {} of {} on {} has original list after scatter: {}"\
         .format(id, numProcesses, myHostName, data))
 
 ########## Run the main function

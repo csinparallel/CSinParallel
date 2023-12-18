@@ -2,7 +2,7 @@
 * ... illustrates the use of MPI_Bcast() for arrays
 * combined with data decomposition pattern using a parallel-for loop with
 * equal chunks. Wraps up with a gather so that completed work is back in
-* master process.
+* conductor process.
 *
 * Libby Shoop, Macalester College, July, 2017
 *
@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
 
     // check conditions for  equal-sized chunks
     if ((MAX % numProcs) == 0 && numProcs <= MAX) {
-        if (myRank == 0) {     // master:
+        if (myRank == 0) {     // conductor:
             fill(array, MAX);                                 // populate original array
             gatherArray = (int*) malloc( MAX * sizeof(int) ); // allocate result array
         }
@@ -129,7 +129,7 @@ int main(int argc, char** argv) {
                     gatherArray, MAX/numProcs, MPI_INT,       //   into gatherArray
                     0, MPI_COMM_WORLD);
 
-        if (myRank == 0) {                                    // master has everything
+        if (myRank == 0) {                                    // conductor has everything
             print("in gatherArray, AFTER gather", myRank, gatherArray, MAX);
             free(gatherArray);                                //clean up
         }

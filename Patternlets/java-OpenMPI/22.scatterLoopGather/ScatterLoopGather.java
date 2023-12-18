@@ -3,10 +3,10 @@
  *      a loop to process those chunks, and 
  *      a gather to combine the piecemeal values.
  *
- * Goal: The master process fills a buffer with values
+ * Goal: The conductor process fills a buffer with values
  *        and scatters it to all the other processes.
  *       Each process doubles the values in its buffer-chunk.
- *       All processes then gather the chunks back to the master.
+ *       All processes then gather the chunks back to the conductor.
  *
  * Joel Adams, Calvin University, November 2019.
  *
@@ -45,7 +45,7 @@ public class ScatterLoopGather {
         System.exit(0);
     }
 
-    if ( id == MASTER ) { 
+    if ( id == CONDUCTOR ) { 
         scatterBuffer = MPI.newIntBuffer(BUFFER_SIZE);
         fill(scatterBuffer);
         gatherBuffer = MPI.newIntBuffer(BUFFER_SIZE);
@@ -57,7 +57,7 @@ public class ScatterLoopGather {
     chunkBuffer = MPI.newIntBuffer(chunkSize);
 
     comm.scatter(scatterBuffer, chunkSize, MPI.INT, 
-                  chunkBuffer, chunkSize, MPI.INT, MASTER);
+                  chunkBuffer, chunkSize, MPI.INT, CONDUCTOR);
 
     printSeparator("----", id);
     printBuffers("AFTER the scatter", id, scatterBuffer, chunkBuffer, gatherBuffer);
@@ -68,7 +68,7 @@ public class ScatterLoopGather {
     printBuffers("AFTER the doubling", id, scatterBuffer, chunkBuffer, gatherBuffer);
 
     comm.gather(chunkBuffer, chunkSize, MPI.INT, 
-                 gatherBuffer, chunkSize, MPI.INT, MASTER);
+                 gatherBuffer, chunkSize, MPI.INT, CONDUCTOR);
 
     printSeparator("----", id);
     printBuffers("AFTER the gather:", id, scatterBuffer, chunkBuffer, gatherBuffer);
@@ -89,7 +89,7 @@ public class ScatterLoopGather {
   /* utility to print a buffer with labels.
    * @param: label, a String.
    * @param: id, an int containing the MPI rank of this process.
-   * @param: sBuf, the IntBuffer the master fills and scatters.
+   * @param: sBuf, the IntBuffer the conductor fills and scatters.
    * @param: cBuf, the IntBuffer for storing a process's chunk.
    * @param: gBuf, the IntBuffer for storing the gathered results.
    * POST: The buffers' contents have been printed, with labels.
@@ -140,15 +140,15 @@ public class ScatterLoopGather {
   /* utility to print a separator string between the 'before' and 'after' parts.
    * @param: separator, a String.
    * @param: id, the rank of this MPI process.
-   * POST: the master has printed the separator to System.out.
+   * POST: the conductor has printed the separator to System.out.
    */
   public static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      MPI.COMM_WORLD.barrier();
   }
 
-  private static final int MASTER      = 0;
+  private static final int CONDUCTOR      = 0;
   private static final int BUFFER_SIZE = 8;
 }
 

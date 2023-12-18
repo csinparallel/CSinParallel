@@ -1,13 +1,13 @@
-# 01masterWorker.py
+# 01conductorWorker.py
 # Multiple processes will run this same program concurrently,
 # each creating different output data.
-# Illustrates the master-worker pattern
+# Illustrates the conductor-worker pattern
 # using basic MPI commands.
 #
 #  Libby Shoop, Macalester College, July 2019
 #
 # Example usage:
-#      python run.py 01masterWorker.py 4
+#      python run.py 01conductorWorker.py 4
 #  Here the 4 signifies the number of processes to start up in mpi.
 #  run.py executes this program within mpirun using
 #         the number of processes given.
@@ -29,7 +29,7 @@ def main():
     myHostName = MPI.Get_processor_name()  #machine name running the code
 
     if id == 0:
-        print("Greetings from the master, {} of {} on {}"\
+        print("Greetings from the conductor, {} of {} on {}"\
         .format(id, numProcesses, myHostName))
     else:
         print("Greetings from a worker, {} of {} on {}"\

@@ -31,7 +31,7 @@ public class MessagePassing2 {
     int id            = comm.getRank();
 
     if ( numProcesses <= 1 || (numProcesses % 2) != 0)  {
-        if (id == MASTER) {
+        if (id == CONDUCTOR) {
             System.out.print("\nPlease run this program using -np N where N is positive and even.\n\n");
         }
         MPI.Finalize();
@@ -62,7 +62,7 @@ public class MessagePassing2 {
 
   private static boolean odd(int number) { return number % 2 != 0; }
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
   private static final int BUFFER_MAX = 256;
 }
 

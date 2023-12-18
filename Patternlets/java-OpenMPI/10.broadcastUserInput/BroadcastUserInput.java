@@ -4,7 +4,7 @@
  *
  * Note: This version uses an IntBuffer of length 1 to store the scalar.
  *
- * Goal: The master process "reads" an input value from the commandline
+ * Goal: The conductor process "reads" an input value from the commandline
  *        and broadcasts it to all the other processes.
  *       Each process outputs its value before and after
  *        the broadcast.
@@ -35,8 +35,8 @@ public class BroadcastUserInput {
 
     IntBuffer answerBuf = MPI.newIntBuffer(1); // allocate buffer
 
-    if (id == MASTER) {
-        getInput(args, answerBuf);             // MASTER: fill buffer
+    if (id == CONDUCTOR) {
+        getInput(args, answerBuf);             // CONDUCTOR: fill buffer
     }
 
     String beforeMsg = "BEFORE the broadcast, the answer of process " + id
@@ -56,7 +56,7 @@ public class BroadcastUserInput {
     MPI.Finalize();
   }
 
-  /* utility to hide details of having the master read an int value
+  /* utility to hide details of having the conductor read an int value
    *  from the commandline (can be adapted to read from anywhere else).
    *
    * @param: args, a String array containing the commandline arguments.
@@ -82,11 +82,11 @@ public class BroadcastUserInput {
    */
   public static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      MPI.COMM_WORLD.barrier();
   }
 
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
 }
 

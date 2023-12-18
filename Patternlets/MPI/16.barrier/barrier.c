@@ -3,7 +3,7 @@
  *
  * Joel Adams, Calvin College, May 2013.
  * Bill Siever, April 2016
- *   (Converted to master/worker pattern).
+ *   (Converted to conductor/worker pattern).
  * Joel Adams, April 2016
  *   (Refactored code so that just one barrier needed).
  *
@@ -20,7 +20,7 @@
 #include <stdio.h>   // printf()
 #include <mpi.h>     // MPI
 
-/* Have workers send messages to the master, which prints them.
+/* Have workers send messages to the conductor, which prints them.
  * @param: id, an int
  * @param: numProcesses, an int
  * @param: hostName, a char*
@@ -39,20 +39,20 @@
  */
 
 #define BUFFER_SIZE 200
-#define MASTER      0
+#define CONDUCTOR      0
 
 void sendReceivePrint(int id, int numProcesses, char* hostName, char* position) {
     char buffer[BUFFER_SIZE] = {'\0'};;
     MPI_Status status;
 
-    if (id != MASTER) {
-        // Worker: Build a message and send it to the Master
+    if (id != CONDUCTOR) {
+        // Worker: Build a message and send it to the Conductor
         int length = sprintf(buffer,
                               "Process #%d of %d on %s is %s the barrier.\n",
                                 id, numProcesses, hostName, position);
         MPI_Send(buffer, length+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
     } else {
-        // Master: Receive and print the messages from all Workers
+        // Conductor: Receive and print the messages from all Workers
         for(int i = 0; i < numProcesses-1; i++) {
            MPI_Recv(buffer, BUFFER_SIZE, MPI_CHAR, MPI_ANY_SOURCE,
                      MPI_ANY_TAG, MPI_COMM_WORLD, &status);

@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     char * receivedString = NULL;
     char hostName[MPI_MAX_PROCESSOR_NAME];
     MPI_Status status;
-    const int SIZE = (32+MPI_MAX_PROCESSOR_NAME) * sizeof(char);
+    size_t SIZE = (32+MPI_MAX_PROCESSOR_NAME) * sizeof(char);
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &id);
@@ -35,8 +35,8 @@ int main(int argc, char** argv) {
     if (numProcesses > 1 && !odd(numProcesses) ) {
         sendString = (char*) malloc( SIZE );
         receivedString = (char*) malloc( SIZE );
-        // sprintf: write to string
-        sprintf(sendString, "Process %d is on host \"%s\"", id, hostName);
+        // write to string
+        snprintf(sendString, SIZE, "Process %d is on host \"%s\"", id, hostName);
 
         if ( odd(id) ) {  // odd processes send, then receive
             MPI_Send(sendString, strlen(sendString)+1,

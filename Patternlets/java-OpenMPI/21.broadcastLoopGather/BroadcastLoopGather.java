@@ -2,16 +2,16 @@
  * ... uses MPI to broadcast a buffer of values, a parallel loop to
  *      process those values, and a gather to combine the piecemeal values.
  *
- * Goal: The master process fills the buffer with values
+ * Goal: The conductor process fills the buffer with values
  *        and broadcasts it to all the other processes.
  *       Each process doubles the values in its buffer-chunk.
- *       All processes then gather the chunks back to the master.
+ *       All processes then gather the chunks back to the conductor.
  *
  * Joel Adams, Calvin University, November 2019,
  *   based on the 2017 C patternlet by Libby Shoop from Macalester College.,
  *
  * Note: This works, but since we assume BUFFER_SIZE is evenly divisible by N;
- *        the master ought to scatter it, not broadcast it.
+ *        the conductor ought to scatter it, not broadcast it.
  *        (See next patternlet.)
  *
  * Usage: mpirun -np 4 java ./BroadcastLoopGather
@@ -49,14 +49,14 @@ public class BroadcastLoopGather {
 
     bcastBuffer = MPI.newIntBuffer(BUFFER_SIZE);
 
-    if ( id == MASTER ) { 
+    if ( id == CONDUCTOR ) { 
         fill(bcastBuffer);
         gatherBuffer = MPI.newIntBuffer(BUFFER_SIZE);
     }
 
     printBuffers("BEFORE the broadcast", id, bcastBuffer, chunkBuffer, gatherBuffer);
 
-    comm.bcast(bcastBuffer, BUFFER_SIZE, MPI.INT, MASTER);
+    comm.bcast(bcastBuffer, BUFFER_SIZE, MPI.INT, CONDUCTOR);
 
     printSeparator("----", id);
     printBuffers("AFTER the broadcast", id, bcastBuffer, chunkBuffer, gatherBuffer);
@@ -68,7 +68,7 @@ public class BroadcastLoopGather {
     printSeparator("----", id);
     printBuffers("AFTER the doubling", id, bcastBuffer, chunkBuffer, gatherBuffer);
 
-    comm.gather(chunkBuffer, chunkSize, MPI.INT, gatherBuffer, chunkSize, MPI.INT, MASTER);
+    comm.gather(chunkBuffer, chunkSize, MPI.INT, gatherBuffer, chunkSize, MPI.INT, CONDUCTOR);
 
     printSeparator("----", id);
     printBuffers("AFTER the gather:", id, bcastBuffer, chunkBuffer, gatherBuffer);
@@ -89,7 +89,7 @@ public class BroadcastLoopGather {
   /* utility to print a buffer with labels.
    * @param: label, a String.
    * @param: id, an int containing the MPI rank of this process.
-   * @param: bBuf, the IntBuffer the master fills and broadcasts.
+   * @param: bBuf, the IntBuffer the conductor fills and broadcasts.
    * @param: cBuf, the IntBuffer for storing a process's chunk.
    * @param: gBuf, the IntBuffer for storing the gathered results.
    * POST: The buffers' contents have been printed, with labels.
@@ -146,15 +146,15 @@ public class BroadcastLoopGather {
   /* utility to print a separator string between the 'before' and 'after' parts.
    * @param: separator, a String.
    * @param: id, the rank of this MPI process.
-   * POST: the master has printed the separator to System.out.
+   * POST: the conductor has printed the separator to System.out.
    */
   public static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      MPI.COMM_WORLD.barrier();
   }
 
-  private static final int MASTER      = 0;
+  private static final int CONDUCTOR      = 0;
   private static final int BUFFER_SIZE = 8;
 }
 

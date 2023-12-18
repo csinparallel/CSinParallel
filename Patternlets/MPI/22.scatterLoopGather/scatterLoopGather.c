@@ -1,7 +1,7 @@
 /* scatterLoopGather.c
  * ... scatters an array of data into equal-sized chunks, 
  *      has each process use a loop to double the values in its chunk,
- *      and then gathers the chunks back to the master process.
+ *      and then gathers the chunks back to the conductor process.
  *
  * Joel Adams, Calvin University, December 2019.
  *
@@ -26,7 +26,7 @@
 #include <stdlib.h>    // malloc, exit, ...
 #include <mpi.h>       // MPI functionality
 
-#define MASTER     0
+#define CONDUCTOR     0
 #define ARRAY_SIZE 8
 
 void fill(int* a, int size);
@@ -50,14 +50,14 @@ int main(int argc, char** argv) {
     printSeparator("", myRank);
 
     if (ARRAY_SIZE % numProcs || numProcs > ARRAY_SIZE) {
-        if (myRank == MASTER) {
+        if (myRank == CONDUCTOR) {
             printf("Please run with -np N divisible by and less than or equal to %d\n.", ARRAY_SIZE);
         }
         MPI_Finalize();
         exit(0);
     }
 
-    if (myRank == MASTER) {     
+    if (myRank == CONDUCTOR) {     
         scatterArray = (int*) malloc( ARRAY_SIZE * sizeof(int) ); // allocate input array
         fill(scatterArray, ARRAY_SIZE);                           // populate it 
         gatherArray = (int*) malloc( ARRAY_SIZE * sizeof(int) );  // allocate result array
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
     print("AFTER gather", myRank, "gatherArray", gatherArray, ARRAY_SIZE);
 
     free(chunkArray);                                            // everyone clean up
-    if (myRank == 0) {                                           // master clean up
+    if (myRank == 0) {                                           // conductor clean up
         free(gatherArray); 
         free(scatterArray);
     }
@@ -122,7 +122,7 @@ void fill(int* a, int size) {
  */
 void printSeparator(const char* separator, int id) {
     MPI_Barrier(MPI_COMM_WORLD);
-    if (id == MASTER) { 
+    if (id == CONDUCTOR) { 
         printf("%s\n", separator);
     }
     MPI_Barrier(MPI_COMM_WORLD);

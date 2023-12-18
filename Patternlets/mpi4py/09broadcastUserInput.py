@@ -1,6 +1,6 @@
 #
 #    Illustrates broacasting a string entered at the command line from
-#    the master node to the rest of the nodes.
+#    the conductor node to the rest of the nodes.
 #
 #  Libby Shoop, Macalester College, July 2019
 #
@@ -8,7 +8,7 @@
 #      python run.py ./09broadcastUserInput.py N dataString
 #  Here the N signifies the number of processes to start up in mpi,
 #  which must be greater than one. The dataString must be supplied
-#  and represents the string that will be broadcast from the master
+#  and represents the string that will be broadcast from the conductor
 #  process to the workers.
 #
 #  run.py executes this program within mpirun using
@@ -34,9 +34,9 @@ import sys
 def checkInput(id):
     numArguments = len(sys.argv)
     if numArguments == 1:
-        #no extra argument was given- master warns and all exit
+        #no extra argument was given- conductor warns and all exit
         if id == 0:
-            print("Please add a string to be broadcast from master to workers")
+            print("Please add a string to be broadcast from conductor to workers")
         sys.exit()
 
 def main():
@@ -48,10 +48,10 @@ def main():
     if numProcesses > 1 :
         checkInput(id)
 
-        if id == 0:        # master
-            #master: get the command line argument
+        if id == 0:        # conductor
+            #conductor: get the command line argument
             data = sys.argv[1]
-            print("Master Process {} of {} on {} broadcasts \"{}\""\
+            print("Conductor Process {} of {} on {} broadcasts \"{}\""\
             .format(id, numProcesses, myHostName, data))
 
         else :

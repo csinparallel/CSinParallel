@@ -40,7 +40,7 @@ public class SequenceNumbers {
     MPI.Finalize();
   }
 
-/* Have workers send messages to the master, which prints them.
+/* Have workers send messages to the conductor, which prints them.
  * @param: id, an int
  * @param: numProcesses, an int
  * @param: hostName, a String
@@ -68,12 +68,12 @@ public class SequenceNumbers {
                                          throws MPIException
   {
       CharBuffer buffer = MPI.newCharBuffer(BUF_SIZE);
-      if ( id != MASTER ) {     // Workers: build & send a message to the Master
+      if ( id != CONDUCTOR ) {     // Workers: build & send a message to the Conductor
           String msg = "This is the " + messageNum + " message from process #"
                         + id + " of " + numProcesses + " on " + hostName + ".\n";
           buffer.put(msg);
-          MPI.COMM_WORLD.send(buffer, msg.length(), MPI.CHAR, MASTER, tagValue);
-      } else {                  // Master: recv & print msg from each Worker
+          MPI.COMM_WORLD.send(buffer, msg.length(), MPI.CHAR, CONDUCTOR, tagValue);
+      } else {                  // Conductor: recv & print msg from each Worker
           for (int i = 1; i < numProcesses; ++i) {
               MPI.COMM_WORLD.recv(buffer, BUF_SIZE, MPI.CHAR,
                                    MPI.ANY_SOURCE, tagValue);
@@ -84,6 +84,6 @@ public class SequenceNumbers {
   }
 
   private static final int BUF_SIZE = 256;
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
 }
 

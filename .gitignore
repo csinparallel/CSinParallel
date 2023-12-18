@@ -20,3 +20,5 @@ printThreads-to-2DArray
 mm-omp
 mm-serial
 mm-um
+mm-openacc
+

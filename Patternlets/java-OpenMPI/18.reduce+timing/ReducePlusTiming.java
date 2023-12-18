@@ -40,10 +40,10 @@ public class ReducePlusTiming {
     double localTime = MPI.wtime() - startTime;
 
     localBuf.put(0, localTime);
-    comm.reduce(localBuf, collectiveBuf, 1, MPI.DOUBLE, MPI.SUM, MASTER);
+    comm.reduce(localBuf, collectiveBuf, 1, MPI.DOUBLE, MPI.SUM, CONDUCTOR);
     double collectiveTime = collectiveBuf.get(0);
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         String answerStr = "\nThe answer is " + answer
                            + ";\ncomputing it took "
                            + localTime + " secs locally, and\n"
@@ -72,6 +72,6 @@ public class ReducePlusTiming {
       return 42;
   }
 
-  private static int MASTER = 0;
+  private static int CONDUCTOR = 0;
 }
 

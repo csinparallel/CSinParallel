@@ -4,7 +4,7 @@
 #
 # Change the following line to the name of your Java class
 
-PROG=MasterWorker
+PROG=ConductorWorker
 
 if [ "$#" -gt 0 ]; then
 	mpirun --mca shmem posix --oversubscribe -np $1 java $PROG

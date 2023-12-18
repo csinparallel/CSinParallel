@@ -4,6 +4,7 @@
  *
  * Hannah Sonsalla, Macalester College 2017
  * Modeled from code by Joel Adams, Calvin College, April 2016.
+ * Updated by Libby Shoop, 2023, for simplicity and use in Intermediate book
  *
  * Usage: mpirun -np N ./broadcastUserInput <integer>
  *
@@ -18,29 +19,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define MASTER 0
-
-/* gets value of answer from user
- * @param: argc, argument count.
- * @param: argv, argument pointer array.
- * @param: myRank, rank of current process
- * @param: answer, variable to store value given by user
- * Precondition: argc is a count of the number of arguments.
- *              && argv is a pointer array that points to the arguments.
- *              && myRank is the rank of this MPI process.
- *		&& answer is the variable to be assigned value.
- * Postcondition: answer has been filled with value from user
- *                if given, else answer remains set to 0.
- */
-void getInput(int argc, char* argv[], int myRank, int* answer) {
-
-    if (myRank == 0){  // master process
-        if (argc == 2){
-             *answer = atoi(argv[1]);
-        }
-    }
-    MPI_Bcast(answer, 1, MPI_INT, 0, MPI_COMM_WORLD);
-}
+#define CONDUCTOR 0
 
 int main(int argc, char** argv) {
     int answer = 0, length = 0;
@@ -52,10 +31,16 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     MPI_Get_processor_name (myHostName, &length);
 
+    if (myRank == CONDUCTOR){ 
+        if (argc == 2){
+             answer = atoi(argv[1]);
+        }
+    }
+
     printf("BEFORE the broadcast, process %d on host '%s' has answer = %d\n",
              myRank, myHostName, answer);
 
-    getInput(argc, argv, myRank, &answer);
+    MPI_Bcast(&answer, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     printf("AFTER the broadcast, process %d on host '%s' has answer = %d\n",
              myRank, myHostName, answer);

@@ -1,6 +1,6 @@
 #
 #    Illustrates scatter a numpy array of unsigned integer values created
-#    in the master process.
+#    in the conductor process.
 #    NOTE: this version uses the python numpy package to generate arrays.
 #
 #  Libby Shoop, Macalester College, January 2020
@@ -54,7 +54,7 @@ def main():
     if id == 0:
         data = genArray(numProcesses, numDataPerProcess)
         #genListOfLists(numElements)
-        print("Master {} of {} on {} has created array: {}"\
+        print("Conductor {} of {} on {} has created array: {}"\
         .format(id, numProcesses, myHostName, data))
     else:
         data = None
@@ -67,7 +67,7 @@ def main():
     comm.Scatter(data, smallerPart, root=0)
 
     if id == 0:
-        print("Master {} of {} on {} has original array after Scatter: {}"\
+        print("Conductor {} of {} on {} has original array after Scatter: {}"\
         .format(id, numProcesses, myHostName, data))
 
     print("Process {} of {} on {} has smaller part after Scatter {}"\
@@ -85,7 +85,7 @@ def main():
     comm.Gather(newValues, data, root=0)
 
     if id == 0:
-        print("Master {} of {} on {} has new data array after Gather:\n {}"\
+        print("Conductor {} of {} on {} has new data array after Gather:\n {}"\
         .format(id, numProcesses, myHostName, data))
 
 

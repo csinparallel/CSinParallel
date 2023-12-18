@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class DynamicLoadBalance {
-    public static final int MASTER = 0;
+    public static final int CONDUCTOR = 0;
 
     // tags that can be applied to messages
     public static final int WORKTAG = 1;
@@ -32,12 +32,12 @@ public class DynamicLoadBalance {
        int numProcesses = MPI.COMM_WORLD.getSize();
        //String hostName  = MPI.getProcessorName();
    
-       if (id == MASTER) {
+       if (id == CONDUCTOR) {
             // create an arbitrary array of numbers for how long each
             // worker task will 'work', by sleeping that amount of seconds
             int numTasks = (numProcesses-1) * 4; // avg 4 tasks per worker process
             int[] workTimes = genTasks(numTasks);
-            System.out.println("master created " + workTimes.length + " values for sleep times:" + Arrays.toString(workTimes));
+            System.out.println("conductor created " + workTimes.length + " values for sleep times:" + Arrays.toString(workTimes));
             handOutWork(MPI.COMM_WORLD, workTimes, numProcesses);
             
        } else {
@@ -73,7 +73,7 @@ public class DynamicLoadBalance {
                 e.printStackTrace();
             } 
 
-            // indicate done with work by sending to Master
+            // indicate done with work by sending to Conductor
             //System.out.println("worker "+comm.getRank()+" completed work!");
             buf.put(0, waitTime);
             comm.send(buf, 1, MPI.INT, 0, WORKTAG);
@@ -83,14 +83,14 @@ public class DynamicLoadBalance {
     private static void handOutWork(Comm comm, int[] workTimes, int numProcesses) throws MPIException {
         int totalWork = workTimes.length;
         int workCount = 0, recvCount = 0;
-        System.out.println("master sending first tasks");
+        System.out.println("conductor sending first tasks");
         IntBuffer sendBuf = MPI.newIntBuffer(1);
          
         for(int id = 1; id < numProcesses; id++) {
             int work = workTimes[workCount++];
             sendBuf.put(0, work);
             comm.send(sendBuf, 1, MPI.INT, id, WORKTAG);
-            System.out.println("master sent "+ work +" to "+id);
+            System.out.println("conductor sent "+ work +" to "+id);
         }
 
         // while there is still work,
@@ -98,18 +98,18 @@ public class DynamicLoadBalance {
         // signals they would like some new work
         IntBuffer recvBuf = MPI.newIntBuffer(1);
         while (workCount < totalWork) {
-            // System.out.println("Master workcount " + workCount + ", total "+ totalWork);
+            // System.out.println("Conductor workcount " + workCount + ", total "+ totalWork);
             // receive next finished result
             Status stat = comm.recv(recvBuf, 1, MPI.INT, MPI.ANY_SOURCE, WORKTAG);
             recvCount++;
             int workerId = stat.getSource();
             int completedWorkTime = recvBuf.get(0);
-            System.out.println("master received "+completedWorkTime+" from "+ workerId);
+            System.out.println("conductor received "+completedWorkTime+" from "+ workerId);
             // send next work
             int newWorkTime = workTimes[workCount++];
             sendBuf.put(0, newWorkTime);
             comm.send(sendBuf, 1, MPI.INT, workerId, WORKTAG);
-            System.out.println("master sent "+newWorkTime+" to "+ workerId);
+            System.out.println("conductor sent "+newWorkTime+" to "+ workerId);
         }
         // Receive results for outstanding work requests.
         while (recvCount < totalWork) {
@@ -117,7 +117,7 @@ public class DynamicLoadBalance {
             recvCount++;
             int workerId = stat.getSource();
             int completedWorkTime = recvBuf.get(0);
-            System.out.println("end: master received "+completedWorkTime+" from "+ workerId);
+            System.out.println("end: conductor received "+completedWorkTime+" from "+ workerId);
         }
 
         // Tell all workers to stop

@@ -21,7 +21,7 @@ import mpi.*;
 public class ParallelLoopEqualChunks {
 
  public static final int REPS = 8;
- public static final int MASTER = 0;
+ public static final int CONDUCTOR = 0;
 
  public static void main(String [] args) throws MPIException {
     MPI.Init(args);
@@ -33,9 +33,9 @@ public class ParallelLoopEqualChunks {
     String message   = "";
 
     // Ensure that the number of processes doesn't exceed REPS.
-    // If that is not the case, have the master print an error msg and stop.
+    // If that is not the case, have the conductor print an error msg and stop.
     if (numProcesses > REPS) {
-      if (id == MASTER) {
+      if (id == CONDUCTOR) {
           System.out.print("\nPlease run with -np N less than or equal to "
                   +  REPS + "\n\n");
       }

@@ -1,6 +1,6 @@
 #
 #    Illustrates broacasting a list from
-#    the master node to the rest of the nodes.
+#    the conductor node to the rest of the nodes.
 #
 #  Libby Shoop, Macalester College, July 2019
 #
@@ -31,10 +31,10 @@ def main():
 
     if numProcesses > 1 :
 
-        if id == 0:        # master
-            #master: generate a dictionary with arbitrary data in it
+        if id == 0:        # conductor
+            #conductor: generate a dictionary with arbitrary data in it
             data = list(range(numProcesses))
-            print("Master Process {} of {} on {} broadcasts {}"\
+            print("Conductor Process {} of {} on {} broadcasts {}"\
             .format(id, numProcesses, myHostName, data))
 
         else :

@@ -22,7 +22,7 @@
 #include <stdio.h>   // printf()
 #include <mpi.h>     // MPI
 
-/* Have workers send messages to the master, which prints them.
+/* Have workers send messages to the conductor, which prints them.
  * @param: id, an int
  * @param: numProcesses, an int
  * @param: hostName, a char*
@@ -45,21 +45,21 @@
  */
 
 #define BUFFER_SIZE 200
-#define MASTER      0
+#define CONDUCTOR      0
 
 void sendReceivePrint(int id, int numProcesses, char* hostName,
                         char* messageNum, int tagValue) {
     char buffer[BUFFER_SIZE] = {'\0'};;
     MPI_Status status;
 
-    if (id != MASTER) {
-        // Worker: Build a message and send it to the Master
+    if (id != CONDUCTOR) {
+        // Worker: Build a message and send it to the Conductor
         int length = sprintf(buffer,
                               "This is the %s message from process #%d of %d on %s.\n",
                                 messageNum, id, numProcesses, hostName);
         MPI_Send(buffer, length+1, MPI_CHAR, 0, tagValue, MPI_COMM_WORLD);
     } else {
-        // Master: Receive and print the messages from all Workers
+        // Conductor: Receive and print the messages from all Workers
         for(int i = 0; i < numProcesses-1; i++) {
            MPI_Recv(buffer, BUFFER_SIZE, MPI_CHAR, MPI_ANY_SOURCE,
                      tagValue, MPI_COMM_WORLD, &status);

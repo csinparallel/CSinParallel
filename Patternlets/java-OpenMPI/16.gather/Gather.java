@@ -30,7 +30,7 @@ public class Gather {
 
     IntBuffer gatherBuf = null;
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         int valuesToGather = BUFFER_SIZE * numProcesses;
         gatherBuf = MPI.newIntBuffer(valuesToGather);
         System.out.print("\nBefore gather: ");
@@ -48,9 +48,9 @@ public class Gather {
     printSeparator("----", id);
 
     comm.gather(computeBuf, BUFFER_SIZE, MPI.INT, 
-                  gatherBuf, BUFFER_SIZE, MPI.INT, MASTER); 
+                  gatherBuf, BUFFER_SIZE, MPI.INT, CONDUCTOR); 
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         System.out.print("After gather: ");
         printBuf(id, "gatherBuf", gatherBuf); 
         System.out.println();
@@ -82,15 +82,15 @@ public class Gather {
   /* utility to print a separator between before and after sections.
    * @param: separator, a String.
    * @param: id, the MPI rank of this process. 
-   * POST: separator has been printed by the master process.
+   * POST: separator has been printed by the conductor process.
    */
   private static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.print(separator + "\n"); }
+     if (id == CONDUCTOR) { System.out.print(separator + "\n"); }
      MPI.COMM_WORLD.barrier();
   }
 
   private static int BUFFER_SIZE = 3;
-  private static int MASTER      = 0;
+  private static int CONDUCTOR      = 0;
 }
 

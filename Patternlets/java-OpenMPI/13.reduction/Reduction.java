@@ -30,13 +30,13 @@ public class Reduction {
 
     IntBuffer sumSquaresBuffer = MPI.newIntBuffer(BUFFER_SIZE);
     comm.reduce(squareBuffer, sumSquaresBuffer, BUFFER_SIZE,
-                 MPI.INT, MPI.SUM, MASTER);
+                 MPI.INT, MPI.SUM, CONDUCTOR);
 
     IntBuffer maxBuffer = MPI.newIntBuffer(BUFFER_SIZE);
     comm.reduce(squareBuffer, maxBuffer, BUFFER_SIZE,
-                 MPI.INT, MPI.MAX, MASTER);
+                 MPI.INT, MPI.MAX, CONDUCTOR);
 
-    if ( id == MASTER) {
+    if ( id == CONDUCTOR) {
         String squareMsg = "\nThe sum of the squares from 1 to "
                             + numProcesses + " is " 
                             + sumSquaresBuffer.get(0) + "\n\n";
@@ -51,6 +51,6 @@ public class Reduction {
   }
 
   private static int BUFFER_SIZE = 1;
-  private static int MASTER      = 0;
+  private static int CONDUCTOR      = 0;
 }
 

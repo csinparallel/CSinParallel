@@ -1,4 +1,4 @@
-OBJ = masterWorker
+OBJ = conductorWorker
 
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -std=c99

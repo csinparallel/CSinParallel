@@ -1,8 +1,8 @@
 /* MessagePassing3.java
  * ... illustrates the use of MPI's send and receive commands
- *      in combination with the master-worker pattern.
+ *      in combination with the conductor-worker pattern.
  *
- * Goal: The master process sends its id to process 1
+ * Goal: The conductor process sends its id to process 1
  *        and receives an array of ids from process N-1.
  *       Every other process i receives an array of ids from process i-1,
  *        appends its id to the buffer, and sends the array to process (i+1)%N.
@@ -29,7 +29,7 @@ public class MessagePassing3 {
     int id            = comm.getRank();
 
     if ( numProcesses <= 1 )  {
-        if (id == MASTER) {
+        if (id == CONDUCTOR) {
             System.out.print("\nPlease run this program using -np N where N is at least 2.\n\n");
         }
         MPI.Finalize();
@@ -40,7 +40,7 @@ public class MessagePassing3 {
     int [] receiveArray = null;
     Status status;
 
-    if ( id == MASTER ) {                              // MASTER:
+    if ( id == CONDUCTOR ) {                              // CONDUCTOR:
         sendArray = new int[1];                        // 0. allocate array
         sendArray[0] = id;                             // 1. put id in the array
         comm.send(sendArray,                           // 2. send: array,
@@ -107,7 +107,7 @@ public class MessagePassing3 {
       System.out.print("\n");
   }
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
   private static final int BUFFER_MAX = 256;
 }
 

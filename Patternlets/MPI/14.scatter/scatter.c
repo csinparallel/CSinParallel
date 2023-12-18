@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     MPI_Comm_size(MPI_COMM_WORLD, &numProcs);
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-    if (myRank == 0) {                                 // master process:
+    if (myRank == 0) {                                 // conductor process:
         arrSend = (int*) malloc( MAX * sizeof(int) );  //  allocate array1
         for (int i = 0; i < MAX; i++) {                //  load with values
             arrSend[i] = (i+1) * 11;

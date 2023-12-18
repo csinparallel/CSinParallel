@@ -1,7 +1,7 @@
 #
 #    Illustrates dynamic assignment of tasks that take
 #    varying amounts of time.
-#    The master task is solely responsible for handing out 'work'
+#    The conductor task is solely responsible for handing out 'work'
 #    to each worker task, who receives it. The time for each worker
 #    task varies between 1 and 6 seconds. As soon as a worker finishes,
 #    they send a message asking for more work.
@@ -45,7 +45,7 @@ def main():
         # worker task will 'work', by sleeping that amount of seconds
         numTasks = (numProcesses-1)*4 # avg 4 tasks per worker process
         workTimes = genTasks(numTasks)
-        print("master created {} values for sleep times:".format(workTimes.size), flush=True)
+        print("conductor created {} values for sleep times:".format(workTimes.size), flush=True)
         print(workTimes, flush=True)
         handOutWork(workTimes, comm, numProcesses)
     else:
@@ -55,14 +55,14 @@ def handOutWork(workTimes, comm, numProcesses):
     totalWork = workTimes.size
     workcount = 0
     recvcount = 0
-    print("master sending first tasks", flush=True)
+    print("conductor sending first tasks", flush=True)
     # send out the first tasks to all workers
     for id in range(1, numProcesses):
         if workcount < totalWork:
             work=workTimes[workcount]
             comm.send(work, dest=id, tag=WORKTAG)
             workcount += 1
-            print("master sent {} to {}".format(work, id), flush=True)
+            print("conductor sent {} to {}".format(work, id), flush=True)
 
     # while there is still work,
     # receive result from a worker, which also
@@ -73,11 +73,11 @@ def handOutWork(workTimes, comm, numProcesses):
         workTime = comm.recv(source=MPI.ANY_SOURCE, status=stat)
         recvcount += 1
         workerId = stat.Get_source()
-        print("master received {} from {}".format(workTime, workerId), flush=True)
+        print("conductor received {} from {}".format(workTime, workerId), flush=True)
         #send next work
         comm.send(workTimes[workcount], dest=workerId, tag=WORKTAG)
         workcount += 1
-        print("master sent {} to {}".format(work, workerId), flush=True)
+        print("conductor sent {} to {}".format(work, workerId), flush=True)
 
     # Receive results for outstanding work requests.
     while (recvcount < totalWork):
@@ -85,7 +85,7 @@ def handOutWork(workTimes, comm, numProcesses):
         workTime = comm.recv(source=MPI.ANY_SOURCE, status=stat)
         recvcount += 1
         workerId = stat.Get_source()
-        print("end: master received {} from {}".format(workTime, workerId), flush=True)
+        print("end: conductor received {} from {}".format(workTime, workerId), flush=True)
 
     # Tell all workers to stop
     for id in range(1, numProcesses):
@@ -103,7 +103,7 @@ def worker(comm):
             return
         # simulate work by sleeping
         time.sleep(waitTime)
-        # indicate done with work by sending to Master
+        # indicate done with work by sending to Conductor
         comm.send(waitTime, dest=0)
 
 ########## Run the main function

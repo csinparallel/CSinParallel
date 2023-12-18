@@ -1,6 +1,6 @@
 /* messagePassing3.c
  * ... illustrates the use of MPI_Send() and MPI_Recv(),
- *      in combination with the master-worker pattern.
+ *      in combination with the conductor-worker pattern.
  *
  * Joel Adams, Calvin College, November 2009.
  *
@@ -27,9 +27,11 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &id);
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
 
+    size_t buf_size = MAX;
+
     if (numProcesses > 1) {
-        if ( id == 0 ) {                              // master:
-            sprintf(sendBuffer, "%d", id);            //  create msg
+        if ( id == 0 ) {                              // conductor:
+            snprintf(sendBuffer, buf_size, "%d", id); //  create msg
 
             MPI_Send(sendBuffer,                      //  msg sent
                       strlen(sendBuffer) + 1,         //  num chars + NULL
@@ -61,7 +63,7 @@ int main(int argc, char** argv) {
                     id, numProcesses, recvBuffer);
 
             // build msg to send by appending id to msg received
-            sprintf(sendBuffer, "%s %d", recvBuffer, id);
+            snprintf(sendBuffer, buf_size, "%s %d", recvBuffer, id);
 
             MPI_Send(sendBuffer,                      //  msg to send
                       strlen(sendBuffer) + 1,         //  num chars + NULL

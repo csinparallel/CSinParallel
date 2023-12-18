@@ -1,8 +1,8 @@
-/* masterWorker.c
- * ... illustrates the basic master-worker pattern in MPI ...
+/* conductorWorker.c
+ * ... illustrates the basic conductor-worker pattern in MPI ...
  * Joel Adams, Calvin College, November 2009.
  *
- * Usage: mpirun -np N ./masterWorker
+ * Usage: mpirun -np N ./conductorWorker
  *
  * Exercise:
  * - Compile and run the program, varying N from 1 through 8.
@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
   MPI_Comm_size(MPI_COMM_WORLD, &numWorkers);
   MPI_Get_processor_name (hostName, &length);
 
-  if ( id == 0 ) {  // process 0 is the master 
-    printf("Greetings from the master, #%d (%s) of %d processes\n",
+  if ( id == 0 ) {  // process 0 is the conductor 
+    printf("Greetings from the conductor, #%d (%s) of %d processes\n",
              id, hostName, numWorkers);
   } else {          // processes with ids > 0 are workers 
     printf("Greetings from a worker, #%d (%s) of %d processes\n",

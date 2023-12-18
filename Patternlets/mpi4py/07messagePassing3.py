@@ -1,6 +1,6 @@
 #
 #    Illustrates send/recv of a list, in combination
-#      with the master-worker pattern.
+#      with the conductor-worker pattern.
 #
 #  Libby Shoop, Macalester College, July 2019
 #
@@ -29,22 +29,22 @@ def main():
 
     if numProcesses > 1 :
 
-        if id == 0:        # master
-            #generate a list with master id in it
+        if id == 0:        # conductor
+            #generate a list with conductor id in it
             sendList = [id]
             # send to the first worker
             comm.send(sendList, dest=id+1)
-            print("Master Process {} of {} on {} sent {}"\
+            print("Conductor Process {} of {} on {} sent {}"\
             .format(id, numProcesses, myHostName, sendList))
             # receive from the last worker
             receivedList = comm.recv(source=numProcesses-1)
-            print("Master Process {} of {} on {} received {}"\
+            print("Conductor Process {} of {} on {} received {}"\
             .format(id, numProcesses, myHostName, receivedList))
         else :
             # worker: receive from any source
             receivedList = comm.recv(source=id-1)
             # add this worker's id to the list and send along to next worker,
-            # or send to the master if the last worker
+            # or send to the conductor if the last worker
             sendList = receivedList + [id]
             comm.send(sendList, dest=(id+1) % numProcesses)
 

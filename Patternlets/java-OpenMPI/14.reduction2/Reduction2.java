@@ -28,7 +28,7 @@ public class Reduction2 {
     IntBuffer srcBuf = MPI.newIntBuffer(BUFFER_SIZE);
     IntBuffer destBuf = MPI.newIntBuffer(BUFFER_SIZE);
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         System.out.print("\nBefore reduction: ");
         printBuf(id, "destBuf", destBuf); 
     }
@@ -42,9 +42,9 @@ public class Reduction2 {
     printSeparator("----", id);
 
     comm.reduce(srcBuf, destBuf, BUFFER_SIZE,
-                 MPI.INT, MPI.SUM, MASTER);
+                 MPI.INT, MPI.SUM, CONDUCTOR);
 
-    if ( id == MASTER) {
+    if ( id == CONDUCTOR) {
         System.out.print("After reduction: ");
         printBuf(id, "destBuf", destBuf);
         System.out.println();
@@ -76,15 +76,15 @@ public class Reduction2 {
   /* utility to print a separator between before and after sections.
    * @param: separator, a String.
    * @param: id, the MPI rank of this process. 
-   * POST: separator has been printed by the master process.
+   * POST: separator has been printed by the conductor process.
    */
   private static void printSeparator(String separator, int id) throws MPIException {
      MPI.COMM_WORLD.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      MPI.COMM_WORLD.barrier();
   }
 
   private static int BUFFER_SIZE = 5;
-  private static int MASTER      = 0;
+  private static int CONDUCTOR      = 0;
 }
 

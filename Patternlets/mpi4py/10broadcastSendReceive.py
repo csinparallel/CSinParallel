@@ -1,6 +1,6 @@
 #
 #    Illustrates broacasting a dictionary, or associative array, from
-#    the master node to the rest of the nodes, but using send and receive
+#    the conductor node to the rest of the nodes, but using send and receive
 #    point-to-point communication functions instead of the collective
 #    broadcast function.
 #
@@ -31,16 +31,16 @@ def main():
 
     if numProcesses > 1 :
 
-        if id == 0:        # master
-            #master: generate a dictionary with arbitrary data in it, then send
+        if id == 0:        # conductor
+            #conductor: generate a dictionary with arbitrary data in it, then send
             data = {'one': 1, 'two': 2, 'three': 3}
-            print("Master Process {} of {} on {} broadcasts {}"\
+            print("Conductor Process {} of {} on {} broadcasts {}"\
             .format(id, numProcesses, myHostName, data))
             for processId in range (1, numProcesses):
                 comm.send(data, dest=processId)
 
         else :
-            # worker: start with empty data, then wait to receive from master
+            # worker: start with empty data, then wait to receive from conductor
             data = {}
             print("Worker Process {} of {} on {} starts with {}"\
             .format(id, numProcesses, myHostName, data))

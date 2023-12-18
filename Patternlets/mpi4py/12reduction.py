@@ -39,7 +39,7 @@ def main():
         sum = square
         max = square
 
-    if id == 0:        # master/root process will print result
+    if id == 0:        # conductor/root process will print result
         print("The sum of the squares is  {}".format(sum))
         print("The max of the squares is  {}".format(max))
 

@@ -3,7 +3,7 @@
  *
  * Note: This version uses an IntBuffer to store the values.
  *
- * Goal: The master process fills an IntBuffer with values
+ * Goal: The conductor process fills an IntBuffer with values
  *        and broadcasts it to all the other processes.
  *       Each process outputs its buffer's values before and after
  *        the broadcast.
@@ -32,7 +32,7 @@ public class Broadcast2 {
 
     IntBuffer buffer = MPI.newIntBuffer(BUFFER_SIZE);  // all: allocate buffers
 
-    if ( id == MASTER ) {                              // MASTER: fill its buffer
+    if ( id == CONDUCTOR ) {                              // CONDUCTOR: fill its buffer
         fill(buffer);
     }
 
@@ -78,16 +78,16 @@ public class Broadcast2 {
    * @param: separator, a String.
    * @param: id, the rank of this MPI process.
    * @param: comm, the Communicator for the processes involved.
-   * POST: the master has printed the separator to System.out.
+   * POST: the conductor has printed the separator to System.out.
    */
   public static void printSeparator(String separator, int id, Comm comm) 
                                       throws MPIException {
      comm.barrier();
-     if (id == MASTER) { System.out.println(separator); }
+     if (id == CONDUCTOR) { System.out.println(separator); }
      comm.barrier();
   }
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
   private static final int BUFFER_SIZE = 8;
 }
 

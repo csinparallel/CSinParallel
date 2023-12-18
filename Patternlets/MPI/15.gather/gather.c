@@ -35,16 +35,16 @@ int main(int argc, char** argv) {
    print(myRank, "computeArray", computeArray,       //  show array1
            SIZE);
 
-   if (myRank == 0) {                                // master:
+   if (myRank == 0) {                                // conductor:
       totalGatheredVals = SIZE * numProcs;           //  allocate array2
       gatherArray = (int*) malloc( totalGatheredVals * sizeof(int) );
    }
 
    MPI_Gather(computeArray, SIZE, MPI_INT,           //  gather array1 vals
                gatherArray, SIZE, MPI_INT,           //   into array2
-               0, MPI_COMM_WORLD);                   //   at master process
+               0, MPI_COMM_WORLD);                   //   at conductor process
 
-   if (myRank == 0) {                                // master process:
+   if (myRank == 0) {                                // conductor process:
       print(myRank, "gatherArray",                   //  show array2
              gatherArray, totalGatheredVals);
       free(gatherArray);                             // clean up

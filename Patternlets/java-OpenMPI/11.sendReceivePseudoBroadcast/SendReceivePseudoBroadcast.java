@@ -1,7 +1,7 @@
 /* SendReceivePseudoBroadcast.java
  * ... uses MPI's send and receive commands to perform a pseudo-broadcast.
  *
- * Goal: The master process sends an array to each worker process.
+ * Goal: The conductor process sends an array to each worker process.
  *
  * Note: You do *not* want to "broadcast" an array or buffer this way,
  *       b/c its time-complexity is linear in the number of processes (O(P)),
@@ -31,18 +31,18 @@ public class SendReceivePseudoBroadcast {
 
     int [] array      = new int[ARRAY_SIZE];
 
-    if (id == MASTER) {
+    if (id == CONDUCTOR) {
         fill(array);
     }
 
     print("BEFORE:", id, array);  // everyone print what they have
 
-    if ( id == MASTER ) {         // Master: send array to each worker
+    if ( id == CONDUCTOR ) {         // Conductor: send array to each worker
         for (int i = 1; i < numProcesses; ++i) {
             comm.send(array, ARRAY_SIZE, MPI.INT, i, 0);
         }
     } else {                      // Workers: receive arrays
-        comm.recv(array, ARRAY_SIZE, MPI.INT, MASTER, 0); 
+        comm.recv(array, ARRAY_SIZE, MPI.INT, CONDUCTOR, 0); 
     }
 
     printSeparator("----", id);
@@ -88,7 +88,7 @@ public class SendReceivePseudoBroadcast {
   }
 
 
-  private static final int MASTER = 0;
+  private static final int CONDUCTOR = 0;
   private static final int ARRAY_SIZE = 8;
 }
 

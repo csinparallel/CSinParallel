@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
 
     if (numProcesses > REPS) {
       if (id == 0) {
-          printf("Please run with -np less than or equal to %d\n.", REPS);
+          printf("Please run with -np less than or equal to %d.\n", REPS);
       }
     } else {
       for (i = id; i < REPS; i += numProcesses) {

@@ -1,0 +1,30 @@
+# VS Code
+.vscode
+sftp.json
+
+*.o
+
+
+#executables
+calcPiSeq
+calcPiMPI
+
+mpi_trap
+seq_trap
+
+mpi_heat2D
+# data files for heat2D display
+final.dat
+initial.dat
+
+mpi_odd_even
+
+mergeSortMPI
+mergeSortSeq
+
+mpiFireSim
+oneFire
+seqFireSim
+
+dd_mpi_equal_chunks
+dd_mpi_dynamic

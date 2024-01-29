@@ -1,37 +1,43 @@
-# Compilers
-GCC = gcc
+# Compiler
 PGCC = pgcc
 
 #option for pgcc
 FAST = -fast
 
 # initial accelerator options
-AOPTS= -acc -ta=tesla:cc75 -Minfo=accel
+AOPTS= -acc=gpu  -Minfo=accel
 
 # accelerator options for managed memory
-AOPTSM= -acc -ta=tesla:cc75,managed -Minfo=accel
+AOPTSM= -acc=gpu -gpu=managed -Minfo=accel
 
 OMP = -fopenmp
+MATH = -lm
 
 # options for pgcc to compile for multicore
-MOPTS = -mp -ta=multicore -Minfo=opt
+MOPTS = -acc=multicore -Minfo=opt
 
-all: vectorAdd_acc vectorAdd_acc_managed vectorAdd_cpu
+PROGS = vectorAdd_acc vectorAdd_acc_managed vectorAdd_mc
+
+all: $(PROGS)
 
 # separate file to be used with other versions of this code
 getCommandLine.o: ../utils/getCommandLine.c
-	$(GCC) -c -o getCommandLine.o ../utils/getCommandLine.c
+	$(PGCC) -c -o getCommandLine.o ../utils/getCommandLine.c
+
+helper_add.o: ../utils/helper_add.c
+	$(PGCC) $(FAST) -c -o helper_add.o ../utils/helper_add.c $(MATH)
 
 # build GPU executable with the pgcc compiler from NVIDIA 
-vectorAdd_acc: vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(PGCC) $(AOPTS) $(OMP) vectorAdd.c getCommandLine.o -o vectorAdd_acc 
+vectorAdd_acc: vectorAdd.c getCommandLine.o helper_add.o
+	$(PGCC) $(AOPTS) $(OMP) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_acc 
 
 # build GPU executable with the pgcc compiler using unified (mamanged) memory
-vectorAdd_acc_managed: vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(PGCC) $(AOPTS) $(OMP) vectorAdd.c getCommandLine.o -o vectorAdd_acc_managed 
+vectorAdd_acc_managed: vectorAdd.c getCommandLine.o helper_add.o
+	$(PGCC) $(AOPTS) $(OMP) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_acc_managed 
 
-vectorAdd_cpu: vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(PGCC) $(FAST) $(MOPTS) $(OMP) vectorAdd.c getCommandLine.o -o vectorAdd_cpu 
+# multicore version
+vectorAdd_mc: vectorAdd.c getCommandLine.o helper_add.o
+	$(PGCC) $(FAST) $(MOPTS) $(OMP) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_mc 
 
 clean:
-	rm -f *.o vectorAdd_acc vectorAdd_acc_managed vectorAdd_cpu *.prof
+	rm -f *.o $(PROGS) *.prof

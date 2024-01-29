@@ -2,31 +2,35 @@
 PGCC = pgcc
 GCC = gcc
 
-#sequential options for pgcc
-FAST = -fast
+#sequential options for pgcc. -fast is minimum level -O2
+FAST = -fast -acc=host
 MOPTS = -Minfo=opt     #shows further optimizations at compile
 
 #sequential options for gcc
-GOPTS = -Ofast -fopenmp -lm
-GOPTSO3 = -O3 -fopenmp -lm
+GOPTS = -O2
+# Note -O2 or -O3 is not possible when using fmaxf from the math library for checking data
+# so we removed the use of it in function checkForErrors() in helper_add.c
 
-all: vectorAdd_gcc vectorAdd_gcc_O3 vectorAdd_pgcc
+LIBS = -lm
+
+PROGS = vectorAdd_gcc vectorAdd_pgcc
+
+all: $(PROGS)
 
 # separate file to be used with other versions of this code
 getCommandLine.o: ../utils/getCommandLine.c
-	$(GCC) -c -o getCommandLine.o ../utils/getCommandLine.c
+	$(GCC) $(GOPTS) -c -o getCommandLine.o ../utils/getCommandLine.c
+
+helper_add.o: ../utils/helper_add.c
+	$(GCC) $(GOPTS) -c -o helper_add.o ../utils/helper_add.c $(LIBS)
 
 # build executable with gcc using fast code optimizations
-vectorAdd_gcc:  vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(GCC) $(GOPTS) vectorAdd.c getCommandLine.o -o vectorAdd_gcc
-
-# build executable with gcc using level 3 code optimizations
-vectorAdd_gcc_O3:  vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	gcc $(GOPTSO3) vectorAdd.c getCommandLine.o -o vectorAdd_gcc_O3
+vectorAdd_gcc:  vectorAdd.c getCommandLine.o helper_add.o
+	$(GCC) $(GOPTS) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_gcc
 
 # build sequential executable with the pgcc compiler from NVIDIA
-vectorAdd_pgcc: vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(PGCC) $(FAST) $(MOPTS) vectorAdd.c getCommandLine.o -o vectorAdd_pgcc 
+vectorAdd_pgcc: vectorAdd.c getCommandLine.o helper_add.o
+	$(PGCC) $(FAST) $(MOPTS) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_pgcc 
 
 clean:
-	rm -f *.o vectorAdd_pgcc vectorAdd_gcc vectorAdd_gcc_O3 *.prof
+	rm -f *.o $(PROGS) 

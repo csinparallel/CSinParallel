@@ -29,7 +29,7 @@
 #include <mpi.h>       // MPI functionality
 
 #define CONDUCTOR     0
-#define ARRAY_SIZE 8
+#define ARRAY_SIZE 10
 
 void fill(int* a, int size);
 void printSeparator(const char* separator, int id);
@@ -61,12 +61,6 @@ int main(int argc, char** argv) {
         exit(0);
     }
 
-    if (myRank == CONDUCTOR) {     
-        scatterArray = (int*) malloc( ARRAY_SIZE * sizeof(int) ); // input array
-        fill(scatterArray, ARRAY_SIZE);                           // populate it 
-        gatherArray = (int*) malloc( ARRAY_SIZE * sizeof(int) );  // result array
-    }
-
     chunkSizeArray = (int*) malloc( numProcs * sizeof(int) );    // chunkSizes
     offsetArray = (int*) malloc( numProcs * sizeof(int) );       // offsets
 
@@ -86,10 +80,17 @@ int main(int argc, char** argv) {
         }
     }
 
-    print("BEFORE Scatter", myRank, "scatterArray", scatterArray, ARRAY_SIZE);
+    if (myRank == CONDUCTOR) {     
+        scatterArray = (int*) malloc( ARRAY_SIZE * sizeof(int) ); // input array
+        fill(scatterArray, ARRAY_SIZE);                           // populate it 
+        gatherArray = (int*) malloc( ARRAY_SIZE * sizeof(int) );  // result array
+
+        print("BEFORE Scatter", myRank, "scatterArray", scatterArray, ARRAY_SIZE);
+    }
     
-    chunkSize = chunkSizeArray[myRank];
-    chunkArray = (int*) malloc(chunkSize * sizeof(int));          // allocate chunk array
+    chunkSize = chunkSizeArray[myRank];                      // all processes
+    chunkArray = (int*) malloc(chunkSize * sizeof(int));     // allocate chunk array
+    for (int i = 0; i < chunkSize; ++i) chunkArray[i] = 0;   // and initialize
 
     print("BEFORE Scatter", myRank, "chunkArray", chunkArray, chunkSize);
 
@@ -109,7 +110,9 @@ int main(int argc, char** argv) {
                 gatherArray, chunkSizeArray, offsetArray, MPI_INT, //   into gatherArray
                 CONDUCTOR, MPI_COMM_WORLD);
 
-    print("AFTER gather", myRank, "gatherArray", gatherArray, ARRAY_SIZE);
+    if (myRank == CONDUCTOR) {
+        print("AFTER gather", myRank, "gatherArray", gatherArray, ARRAY_SIZE);
+    }
 
     free(chunkArray);                                            // everyone clean up
     if (myRank == 0) {                                           // conductor clean up

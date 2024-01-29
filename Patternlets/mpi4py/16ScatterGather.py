@@ -53,7 +53,6 @@ def main():
 
     if id == 0:
         data = genArray(numProcesses, numDataPerProcess)
-        #genListOfLists(numElements)
         print("Conductor {} of {} on {} has created array: {}"\
         .format(id, numProcesses, myHostName, data))
     else:

@@ -41,7 +41,7 @@ void fill(int* a, int size) {
 * @param: numProcesses, total number of processes being used
 * @param: id, the rank, or id of current process executing this function
 * @param: array, the array of integers whose chunk this process will work on.
-* @param: myChunk, a smaller array that will contain the complated work
+* @param: myChunk, a smaller array that will contain the completed work
 *
 * This function will work on a portion of the array by doubling the value
 * at each index in the array that this process id is responsible for.
@@ -82,11 +82,11 @@ void workOnChunk(int reps, int numProcesses, int id, int* array, int* myChunk) {
 * Postcondition: str, id, and a have all been written to stdout.
 */
 void print(char* str, int id, int* a, int numElements) {
-    printf("%s , process %d has: {", str, id);
-    for (int i = 0; i < numElements - 1; i++) {
-        printf("%d, ", a[i]);
+    printf("%s process %d is: ", str, id);
+    for (int i = 0; i < numElements; i++) {
+        printf("%d ", a[i]);
     }
-    printf("%d}\n", a[numElements - 1]);
+    printf("\n");
 }
 
 #define MAX 8
@@ -112,25 +112,24 @@ int main(int argc, char** argv) {
             gatherArray = (int*) malloc( MAX * sizeof(int) ); // allocate result array
         }
 
-        print("BEFORE Bcast", myRank, array, MAX);
+        print("BEFORE Bcast, original array on", myRank, array, MAX);
 
         MPI_Bcast(array, MAX, MPI_INT, 0, MPI_COMM_WORLD);
 
-        print("AFTER Bcast", myRank, array, MAX);
+        print("AFTER Bcast, original array on", myRank, array, MAX);
 
         myChunk = (int*) malloc(MAX/numProcs * sizeof(int));  // holds my work
         workOnChunk(MAX, numProcs, myRank, array, myChunk);
 
-        print("AFTER doubling", myRank, array, MAX);          //array should not change
-
-        MPI_Barrier(MPI_COMM_WORLD);                          // ensure all are finished
+        // print("AFTER doubling, original array on ", myRank, array, MAX);  //array should not change
+        print("After doubling, computed portion on", myRank, myChunk, MAX/numProcs);
 
         MPI_Gather(myChunk, MAX/numProcs, MPI_INT,            //  gather chunk vals
                     gatherArray, MAX/numProcs, MPI_INT,       //   into gatherArray
                     0, MPI_COMM_WORLD);
 
         if (myRank == 0) {                                    // conductor has everything
-            print("in gatherArray, AFTER gather", myRank, gatherArray, MAX);
+            print("AFTER gather, gatherArray on", myRank, gatherArray, MAX);
             free(gatherArray);                                //clean up
         }
     } else {                                                  // bail if unequal chunks

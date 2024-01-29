@@ -1,4 +1,4 @@
-#include <math.h>   // ceil function
+#include <math.h>   // fmaxf function
 #include <stdio.h>  // printf
 #include <stdlib.h> // malloc
 #include <omp.h>    // openMP (just for timing)
@@ -9,11 +9,12 @@
 // command line arguments
 #include "../utils/getCommandLine.h"
 
-// Original CPU version of add sequentially, updated for OpenACC
-void CPUadd(int n, float *x, float *y)
+// Original CPU version of add, updated for OpenACC
+// to run on GPU
+void GPUadd(int n, float *x, float *y)
 {
   #pragma acc kernels
-  #pragma acc loop independent 
+  #pragma acc loop independent
   for (int i = 0; i < n; i++) {
     y[i] = x[i] + y[i];
   }
@@ -57,7 +58,9 @@ int main(int argc, char **argv)
   
   double start, end;
   start = omp_get_wtime();
-  CPUadd(N, x, y);
+
+  GPUadd(N, x, y);
+
   end = omp_get_wtime();
   printf("Time: %lf secs\n", end - start);
 

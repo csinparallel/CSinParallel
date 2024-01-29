@@ -17,7 +17,8 @@
 
 #include <stdio.h>    // printf()
 #include <stdlib.h>   // rand(), srand()
-#include <unistd.h>   // usleep()
+// #include <unistd.h>   // usleep()
+#include <time.h>     // nanosleep()
 #include <mpi.h>      // MPI functions
 
 const int CONDUCTOR        = 0;
@@ -31,8 +32,9 @@ const int DONE_TAG      = 1;
  *           integers from the range MIN_TASK_TIME..MAX_TASK_TIME.
  */
 int* generateQueue(int numTasks) {
-    const int MIN_TASK_TIME = 1000000;    // 1 sec in microseconds
-    const int MAX_TASK_TIME = 10000000;   // 10 secs in microseconds
+    const int MIN_TASK_TIME = 100000000;    // nanoseconds
+    const int MAX_TASK_TIME = 1000000000;   // nanoseconds
+
                                           // allocate the dynamic array
     int* taskQ = malloc(numTasks * sizeof(int));
 
@@ -112,7 +114,10 @@ void performWork(int id) {
         if (tag != DONE_TAG) {
             printf("Worker %d: received %d from Conductor\n", id, taskTime);
 
-            usleep(taskTime);      // simulate performing the task
+            // usleep(taskTime);      // simulate performing the task
+            struct timespec remaining, request = { 0, taskTime };
+           nanosleep(&request, &remaining);
+            // sleep(taskTime);
                                    // then notify the Conductor
             MPI_Send(&taskTime, 1, MPI_INT, CONDUCTOR, WORK_TAG, MPI_COMM_WORLD);
         } else {

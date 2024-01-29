@@ -1,4 +1,4 @@
-#include <math.h>   // ceil function
+#include <math.h>   // fmaxf function
 #include <stdio.h>  // printf
 #include <stdlib.h> // malloc
 

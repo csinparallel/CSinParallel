@@ -1,6 +1,6 @@
 PROG   = taskQueue
 CC     = mpicc
-CFLAGS = -Wall -ansi -pedantic -std=c99
+CFLAGS = -Wall -pedantic -std=gnu99
 LFLAGS = -o $(PROG) -lm
 
 $(PROG): $(PROG).c

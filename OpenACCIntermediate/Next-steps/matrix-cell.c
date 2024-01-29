@@ -1,5 +1,6 @@
 /*
- * OpenACC GPU version of matrix multiplication.
+ * OpenACC GPU version of matrix cell operations.
+ * Demonstrates collapse clause.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,84 +13,78 @@ void fillMatrix(int size, float * A);
 void getArguments(int argc, char **argv, int *size, int *verbose, int *check);
 void debugPrintMatrix(int verbose, int size, float *matrix, const char *msg);
 void showMatrix(int size, float * matrix);
-void verfiyCorrect(int size, float *matrix);
+void checkForErrors(float *y, int N);
 
-// mutiply matrix A times matrix B, placing result in matrix C
-void MatrixMult(int size, float * __restrict__ A, 
-               float * __restrict__ B, float * __restrict__ C) {
 
-#pragma acc data copyin(A,B) copy(C)
-#pragma acc kernels
-#pragma acc loop collapse(2) independent 
-  for (int i = 0; i < size; ++i) {
-    for (int j = 0; j < size; ++j) {
-      float tmp = 0.;
-      #pragma acc loop seq 
-      for (int k = 0; k < size; ++k) {
-        tmp += A[i*size + k] * B[k*size + i];
+// device function:
+// Update matrix A values by doing some math
+//
+void MatrixUpdate(int size, float * __restrict__ A) {
+
+   #pragma acc data copy(A)   // not strictly necessary
+   #pragma acc kernels
+   #pragma acc loop collapse(2) independent 
+   for (int i = 0; i < size; ++i) {
+      for (int j = 0; j < size; ++j) {
+         // do some contrived calculations that add up to 1.0 in each cell
+         // when each data element is equal to Pi.
+         A[i*size + j] = hypot(cos(A[i*size + j]), sin(A[i*size + j]));
+
       }
-      C[i*size + j] = tmp;    // update cell of C once
-    }
   }
 }
 
+////////////////////////////////////////////////////////// main
 int main (int argc, char **argv) {
  
    // default values
    int size = 256;          // num rows, cols of square matrix
    int verbose = 0;         // default to not printing matrices
-    int check = 0;           // check for errors if >0
+   int check = 0;           // check for errors if >0
    getArguments(argc, argv, &size, &verbose, &check); //change defaults
 
-   printf("matrix rows, cols = %d\n", size);
+   float * A;  // matrix to fill and perform calculations on
 
-   float * A;  // input matrix
-   float * B;  // input matrix
-   float * C;  // output matrix
-
-// Use a 'flattened' 1D array of contiguous memory for the matrices
-// size = number of rows = number of columns in the square matrices
+   // Use a 'flattened' 1D array of contiguous memory for the matrix
+   // size = number of rows = number of columns in the square matrix
    size_t num_elements = size * size * sizeof(float);
    A = (float *)malloc(num_elements);
-   B = (float *)malloc(num_elements);
-   C = (float *)malloc(num_elements);
 
    fillMatrix(size, A);
-   fillMatrix(size, B);
+   
    char msgA[32] = "matrix A after filling:";
    debugPrintMatrix(verbose, size, A, msgA);
    
    double startTime = omp_get_wtime();
    
-   MatrixMult(size, A, B, C);
+   MatrixUpdate(size, A);
 
-   char msgC[32] = "matrix C after MatrixMult(): ";
-   debugPrintMatrix(verbose, size, C, msgC);
+   char msgC[32] = "matrix A after Matrixupdate(): ";
+   debugPrintMatrix(verbose, size, A, msgC);
    
    double endTime = omp_get_wtime();
 
-   printf("\nTotal omp runtime %f seconds (%f milliseconds)\n", 
+   printf("\nTotal runtime %f seconds (%f milliseconds)\n", 
    (endTime-startTime), (endTime-startTime)*1000);
 
    if (check) {
-      verfiyCorrect(size, C);
+      checkForErrors(A, size);
    }
 
-   free(A); free(B); free(C); 
+   free(A); 
    return 0;
 }
 ////////////////////////////////////// end main
 
 // fill a given square matrix with rows of float values 
-// equal to each row number
+// equal to Pi
 void fillMatrix(int size, float * A) {
    for (int i = 0; i < size; ++i) {
       for (int j = 0; j < size; ++j) {
-        A[i*size + j] = ((float)i);
+        A[i*size + j] = ((float)M_PI);
       }
    }
 }
-
 
 void getArguments(int argc, char **argv, int *size, int *verbose, int *check) {
    // 3 arguments optional: 
@@ -133,19 +128,12 @@ void showMatrix(int size, float * matrix) {
    }
 }
 
-// Check whether last row of result matrix is what we expect
-void verfiyCorrect(int size, float *matrix) {
-   // determine what the last row should contain
-   float lastRowValue = 0.0;
-   float maxError = 0.0;
-   float nextVal = 0.0;
-
-   for (int i=0; i<size; i++) 
-      lastRowValue += i * (size-1);
-   
-   for (int j=0; j<size; j++) {
-      nextVal = matrix[(size-1)*size + j];
-      maxError = fmaxf(maxError, fabs(nextVal - lastRowValue));
-   }
-   printf("max error of last row matrix C values: %f\n", maxError);
+// check whether the kernel functions worked as expected
+void checkForErrors(float *y, int N) {
+  // Check for errors (all values should be 1.0f)
+  float maxError = 0.0f;
+  for (int i = 0; i < N; i++)
+    maxError = fmaxf(maxError, fabs(y[i] - 1.0));
+  printf("Max error: %f\n", maxError);
 }
+

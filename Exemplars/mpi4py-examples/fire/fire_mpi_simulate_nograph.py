@@ -8,10 +8,9 @@
 #
 # Libby Shoop     Macalester College
 #
-
-import matplotlib.pyplot as plt
 import math
 import time
+import numpy as np
 from mpi4py import MPI
 
 from fire_functions import *
@@ -120,24 +119,15 @@ def main():
         total_time = finish - start
         print("Total Running time: {0:12.4f} seconds".format(total_time))
 
-        # Create a figure with 2 plots of the simulation results
+        # Report data the simulation results
         upper_title = "Simulation: {0} trials for each probability\n {1}x{1} forest\nRun time on {2} processes: {3:12.4f} seconds"
         upper_title = upper_title.format(tot_num_trials, row_size,  numProcesses, total_time)
 
-        # 2 plots side by side
-        fig, (ax1, ax2) = plt.subplots(1, 2, gridspec_kw={'wspace': 0.24}, figsize=(8.5,6))
-        fig.canvas.manager.set_window_title("Forest Fire Simulation with Multiple Trials in Parallel")
-        print("figure width: {}".format(fig.get_figwidth()))
-        # fig.set_figwidth(fig.get_figwidth() + 1.0, forward=True)
-        fig.suptitle(upper_title)
+        print("Average percent of trees burned at each probability:")
+        print(percent_burned_data )
+        print("Average number of iterations per each probability:")
+        print(iters_per_sim_data)
 
-        ax1.plot(percent_burned_data[:,0], percent_burned_data[:,1], linestyle='-', marker='.', color='tab:blue')
-        ax1.set(xlabel="Probability threshold", ylabel="Avg percent burned")
-
-        ax2.plot(iters_per_sim_data[:,0], iters_per_sim_data[:,1], linestyle='-', marker='.', color='xkcd:maroon')
-        ax2.set(xlabel="Probability threshold", ylabel="Avg iterations per simulation")
-
-        plt.show()
 
 ########## Run the main function
 main()

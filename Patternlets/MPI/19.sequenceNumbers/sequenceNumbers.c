@@ -59,7 +59,7 @@ void sendReceivePrint(int id, int numProcesses, char* hostName,
                                 messageNum, id, numProcesses, hostName);
         MPI_Send(buffer, length+1, MPI_CHAR, 0, tagValue, MPI_COMM_WORLD);
     } else {
-        // Conductor: Receive and print the messages from all Workers
+        // Conductor: Receive and print the messages with a given tag from all Workers
         for(int i = 0; i < numProcesses-1; i++) {
            MPI_Recv(buffer, BUFFER_SIZE, MPI_CHAR, MPI_ANY_SOURCE,
                      tagValue, MPI_COMM_WORLD, &status);

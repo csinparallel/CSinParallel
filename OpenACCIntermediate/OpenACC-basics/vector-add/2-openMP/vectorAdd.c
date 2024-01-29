@@ -1,4 +1,4 @@
-#include <math.h>   // ceil function
+#include <math.h>   // fmaxf function
 #include <stdio.h>  // printf
 #include <stdlib.h> // malloc
 #include <omp.h>    // openMP
@@ -8,7 +8,7 @@
 // command line arguments
 #include "../utils/getCommandLine.h"
 
-// CPU version of add sequentially
+// CPU version of add using openmp pragma
 void CPUadd(int n, float *x, float *y)
 {
   #pragma omp parallel for shared(n, x, y)

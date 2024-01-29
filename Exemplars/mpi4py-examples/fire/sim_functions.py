@@ -13,7 +13,7 @@ def parseArguments():
     Run with -h to get details of each argument.
 
     Returns:
-        A list containg each argument provided
+        A list containing each argument provided
     """
     # process command line arguments
     # see https://docs.python.org/3.3/howto/argparse.html#id1

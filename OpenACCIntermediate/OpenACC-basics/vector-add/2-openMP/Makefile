@@ -2,36 +2,37 @@
 GCC = gcc
 PGCC = pgcc
 
-#sequential options for pgcc
-FAST = -fast
+# options for pgcc
+FAST = -fast -mp
 
-#sequential options for gcc
-GOPTS = -Ofast -fopenmp -lm
-GOPTSO3 = -O3 -fopenmp -lm
+# options for gcc
+# -fast on pgcc is roughly equivalent to -O2
+GOPTS = -O2
+
+LIBS = -fopenmp -lm 
 
 MOPTS = -Minfo=opt     #shows further optimizations at pgcc compile
 
-all: vectorAdd_omp vectorAdd_omp_O3 vectorAdd_omp_pgcc vectorAdd_omp_fast_pgcc
+all: vectorAdd_omp_fast_gcc vectorAdd_omp_pgcc vectorAdd_omp_fast_pgcc
 
 # separate file to be used with other versions of this code
 getCommandLine.o: ../utils/getCommandLine.c
 	$(GCC) -c -o getCommandLine.o ../utils/getCommandLine.c
 
-# build executable with gcc using fast code optimizations
-vectorAdd_omp:  vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(GCC) $(GOPTS) vectorAdd.c getCommandLine.o -o vectorAdd_omp
+helper_add.o: ../utils/helper_add.c
+	$(GCC) $(GOPTS) -c -o helper_add.o ../utils/helper_add.c $(LIBS)
 
-# build executable with gcc using level 3 code optimizations
-vectorAdd_omp_O3:  vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(GCC) $(GOPTSO3) vectorAdd.c getCommandLine.o -o vectorAdd_omp_O3
+# build executable with gcc using fast code optimizations
+vectorAdd_omp_fast_gcc:  vectorAdd.c getCommandLine.o helper_add.o
+	$(GCC) $(GOPTS) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_omp_fast_gcc $(LIBS)
 
 # build openMP executable with the pgcc compiler from NVIDIA
-vectorAdd_omp_pgcc: vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(PGCC) $(MOPTS) vectorAdd.c getCommandLine.o -o vectorAdd_omp_pgcc 
+vectorAdd_omp_pgcc: vectorAdd.c getCommandLine.o helper_add.o
+	$(PGCC) $(MOPTS) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_omp_pgcc $(LIBS)
 
 # build openMP executable with the pgcc compiler from NVIDIA using -fast
-vectorAdd_omp_fast_pgcc: vectorAdd.c getCommandLine.o ../utils/helper_add.h
-	$(PGCC) $(FAST) $(MOPTS) vectorAdd.c getCommandLine.o -o vectorAdd_omp_fast_pgcc 
+vectorAdd_omp_fast_pgcc: vectorAdd.c getCommandLine.o helper_add.o
+	$(PGCC) $(FAST) $(MOPTS) vectorAdd.c getCommandLine.o helper_add.o -o vectorAdd_omp_fast_pgcc $(LIBS)
 
 clean:
 	rm -f *.o vectorAdd_omp* *.prof

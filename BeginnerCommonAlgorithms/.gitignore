@@ -1,0 +1,6 @@
+selectionMPI1
+selectionMPI2
+selection_seq
+selectionOMP_critical
+selectionOMP_lock
+selectionOMP_reduction

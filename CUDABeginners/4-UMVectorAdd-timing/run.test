@@ -1,0 +1,19 @@
+<
+$ ./vectorAdd
+> /Max error:.*/
+>=0
+
+<
+$ ./vectorAdd_cudaTiming 
+> /Max error:.*/
+>=0
+
+<
+$ ./vectorAdd-1
+> /Max error:.*/
+>=0
+
+<
+$ ./vectorAdd-all
+> /Max error:.*/
+>=0

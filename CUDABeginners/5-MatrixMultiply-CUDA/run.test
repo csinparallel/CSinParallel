@@ -1,0 +1,14 @@
+<
+$ ./mm-serial
+> /max error.*/
+>=0
+
+<
+$ ./mm-omp
+> /max error.*/
+>=0
+
+<
+$ ./mm-cuda-um 
+> /max error.*/
+>=0

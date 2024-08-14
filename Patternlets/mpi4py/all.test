@@ -1,0 +1,116 @@
+# This is a definition for tests that can be run using shelltestrunner.
+# Usage:
+#
+#     shelltestrunner -c all.test
+#
+
+# 00
+<
+$ mpirun -np 4 python3 00spmd.py
+> /Greetings.*/
+>=0
+
+# 01
+<
+$ mpirun -np 4 python3 01conductorWorker.py 
+> /Greetings.*/
+>=0
+
+# 02
+<
+$ mpirun -np 4 python3 02parallelLoopEqualChunks.py
+> /Process.*/
+>=0
+
+# 03
+<
+$ mpirun -np 4 python3 03parallelLoopChunksOf1.py
+> /Process.*/
+>=0
+
+# 04 is deadlock so don't test it !!!!!!
+
+
+# 05
+<
+$ mpirun -np 4 python3 05messagePassing.py
+> /Process.*/
+>=0
+
+# 06
+<
+$ mpirun -np 4 python3 06messagePassing2.py
+> /Process.*/
+>=0
+
+# 07
+<
+$ mpirun -np 4 python3 07messagePassing3.py 
+> /Process.*/
+>=0
+
+# 08
+<
+$ mpirun -np 4 python3 08broadcast.py
+> /Process.*/
+>=0
+
+# 09
+<
+$ mpirun -np 4 python3 09broadcastUserInput.py Yipeee
+> /Process.*/
+>=0
+
+# 09 user input
+<
+$ mpirun -np 4 python3 09broadcastUserInputParseArgs.py 22 64.5
+> /Process.*/
+>=0
+
+# 10
+<
+$ mpirun -np 4 python3 10broadcastSendReceive.py
+> /Process.*/
+>=0
+
+# 11
+<
+$ mpirun -np 4 python3 11broadcastList.py 
+> /Process.*/
+>=0
+
+# 12
+<
+$ mpirun -np 4 python3 12reduction.py 
+> /sum.*/
+>=0
+
+# 13
+<
+$ mpirun -np 4 python3 13reductionList.py
+> /resulting.*/
+>=0
+
+# 14
+<
+$ mpirun -np 4 python3 14scatter.py
+> /Process.*/
+>=0
+
+# 15
+<
+$ mpirun -np 4 python3 15gather.py 
+> /Process.*/
+>=0
+
+# 16  note this requires numpy to be installed
+<
+$ mpirun -np 4 python3 16ScatterGather.py
+> /Process.*/
+>=0
+
+# 17
+<
+$ mpirun -np 4 python3 17dynamicLoadBalance.py
+> /end:.*/
+>=0

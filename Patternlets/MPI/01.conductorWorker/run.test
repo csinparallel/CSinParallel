@@ -1,0 +1,4 @@
+<
+$ mpirun -np 4 ./conductorWorker
+> /Greetings.*/
+>=0

@@ -1,0 +1,22 @@
+<
+$ make clean
+>
+rm -f calcPiSeq *.o *~ *#
+>=0
+
+<
+$ make
+>
+g++ -Wall -std=c++11 calcPiSeq.C -o calcPiSeq -I/usr/local/include/trng -ltrng4
+>=0
+
+<
+$ ./calcPiSeq 12000000
+> /Pi is approximately.*/
+>=0
+
+<
+$ make clean
+>
+rm -f calcPiSeq *.o *~ *#
+>=0

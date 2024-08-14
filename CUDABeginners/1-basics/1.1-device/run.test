@@ -1,0 +1,4 @@
+<
+$ ./device_info
+> /Device.*/
+>=0

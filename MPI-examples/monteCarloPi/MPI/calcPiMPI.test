@@ -1,0 +1,22 @@
+<
+$ make clean
+>
+rm -f calcPiMPI a.out *~ *# *.o
+>=0
+
+<
+$ make
+>
+mpic++ -Wall -std=c++11 calcPiMPI.C -o calcPiMPI -I/usr/local/include/trng -ltrng4
+>=0
+
+<
+$ mpirun -np 4 ./calcPiMPI 12000000 
+> /Pi is approximately.*/
+>=0
+
+<
+$ make clean
+>
+rm -f calcPiMPI a.out *~ *# *.o
+>=0

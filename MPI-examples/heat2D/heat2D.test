@@ -1,0 +1,25 @@
+# a samll test case. Using the pipe to grep because output has varying time
+# and using regex for it was problematic
+<
+$ mpirun -np 5 ./mpi_heat2D -x 128 -y 128
+> /Time.*/
+>=0
+
+#default medium-sized case
+$ mpirun -np 5 ./mpi_heat2D 
+> /Time.*/
+>=0
+
+# a large test case should fail with seg fault on stderr
+<
+$ mpirun -np 5 ./mpi_heat2D -x 1280 -y 1280 
+>2 /fault/
+>=!0
+
+# using regex for it was problematic, but I figured it out:
+# it has to be on the same line as the > for the output
+# And the .* is necessary
+<
+$ mpirun -np 5 ./mpi_heat2D -x 128 -y 128
+> /Time.*/
+>=0

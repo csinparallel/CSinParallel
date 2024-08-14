@@ -1,0 +1,14 @@
+<
+$ ./dim3Demo
+> /Grid Dimensions.*/
+>=0
+
+<
+$ ./dim3Demo1D1D
+> /Grid Dimensions.*/
+>=0
+
+<
+$ ./dim3Demo1D2D
+> /Grid Dimensions.*/
+>=0

@@ -1,0 +1,9 @@
+<
+$ ./print1Block
+> /1D grid.*/
+>=0
+
+<
+$ ./print2Blocks
+> /1D grid.*/
+>=0

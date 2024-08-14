@@ -1,0 +1,4 @@
+<
+$ mpirun -np 4 ./broadcast
+> /BEFORE.*/
+>=0

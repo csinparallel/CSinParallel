@@ -1,0 +1,4 @@
+<
+$ mpirun -np 4 ./messagePassing
+> /Process.*/
+>=0

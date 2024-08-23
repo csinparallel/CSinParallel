@@ -25,13 +25,19 @@ mm-serial
 mm-um
 mm-openacc
 
+# prng examples
 coinFlip_omp 
 coinFlip_seq
 diceSim_omp
-loopRepetitions
-loopEqualChunks
-loopChunksOfOne
 histogram_omp 
 histogram_seq
 roulette_omp 
 roulette_seq
+
+# prng patterns
+loopRepetitions
+loopEqualChunks
+loopChunksOfOne
+nestedLoopsMC
+
+

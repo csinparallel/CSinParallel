@@ -281,7 +281,8 @@ The sequential nested for loop code snippet looks like this:
 
 In many cases of simulations like this where the world is represented by a structured 2D grid, we flatten that grid into a 1D array and devise formulas for determining the index of each cell in 2D, (i,j) space as in index into a 1-D array. In this simulation that uses a 'neighborhood' of 8 cells around a cell to determine its state on the next iteration, we also use 'ghost' rows and columns, as we described earlier. We thus represent a 4x4 2D array like this, where the numbers inside each cell are the indices of a flattened 1D array:
 
-![[matrix_flattened_1.drawio.png]]
+<img src="./docs_images/matrix_flattened_1.drawio.png" alt="Grid with ghost rows and columns" >
+
 The yellow cells are the ghost row or column values, which get copied from the nearest real cell values during each iteration. The actual grid representing the data for the states of the mushrooms within it are in white. When executing sequentially, the function `calcNewGrid`  starts with cell (1,1) of the 2D grid, which is index 7 in the flattened 1D array representing the grid. In a nested loop, this function goes across each row of white cells to compute a random number and use it to call the `apply_rules` function. Study this function and be sure that you understand the computation of the index into the flattened array, which is the variable called `id`.
 
 Now let's observe the code for the nested loop in `grid_omp_rand_cpp/cpprandom_calcNewGrid.cpp`:
@@ -295,7 +296,8 @@ For each of these examples, l is the length of the grid (number of rows) ad w is
 
 To illustrate this parallel version, suppose we use 2 threads to compute these new values each time- this is a good use of parallelism because applying the rules in one cell and writing to the new grid is completely independent for every cell in an iteration. The key to correctly implementing this nested loop is to realize that for the random number generators, the correct approach is to have each thread work on a column in the flattened version of the array. The following shows this, with thread 0 working on the green cells of the flattened array, and thread 1 working on the blue cells:
 
-![[matrix_flattened_2.drawio.png]]
+
+<img src="./docs_images/matrix_flattened_2.drawio.png" alt="2 Threads work on columns of Grid" >
 
 **STOP and ponder**: convince yourself that the code for the nested loop will work as shown in this picture above for a 4x4 grid.
 

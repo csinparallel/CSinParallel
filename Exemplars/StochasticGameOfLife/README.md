@@ -193,8 +193,8 @@ To see the glider in action try this:
 ```
 Note that we have used the -a flag for animation and the -c flag to start with the glider pattern. 
 
-Here is a movie file of this animation:
-![[glider.mp4]]
+There is a movie file of this animation in `docs_images/glider.mp4` [link] (https://github.com/csinparallel/CSinParallel/blob/main/Exemplars/StochasticGameOfLife/docs_images/glider.mp4).
+
 
 One thing to observe about this particular execution is how once the glider got to the top edge it rotated to the bottom. This is a demonstration of the ghost rows in action.
 

@@ -118,8 +118,7 @@ all: $(PROGS) $(STOCHASTIC_PROGS) $(PROGS_TRNG) $(STOCHASTIC_PROGS_TRNG)
 The PROGS are executables that will build using the files devoted to the C++ random library listed above. The  PROGS_TRNG are the executables that will build using the files given for the trng random number library listed above.
 
 
-<img src="./docs_images/exclamation-in-triangle.jpg" alt="Warning" width="30" height="30">
-If you do not have the trng random number generation library installed on the machine where you are building this code, you will need to comment out the trng-based executables in the 'all' line like this:
+<img src="./docs_images/exclamation-in-triangle.jpg" alt="Warning" width="30" height="30"> If you do not have the trng random number generation library installed on the machine where you are building this code, you will need to comment out the trng-based executables in the 'all' line like this:
 
 ```
 all: $(PROGS) $(STOCHASTIC_PROGS) #$(PROGS_TRNG) $(STOCHASTIC_PROGS_TRNG)

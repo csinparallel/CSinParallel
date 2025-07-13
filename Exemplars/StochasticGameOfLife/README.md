@@ -1,5 +1,5 @@
 
-# Parallelizing the Game of Life with OpenMP
+# Parallelizing the Game of Life with OpenMP and Randomness
 
 Libby Shoop,  Macalester College
 

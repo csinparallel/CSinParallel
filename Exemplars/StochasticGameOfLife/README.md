@@ -257,7 +257,7 @@ Now let's look carefully at how this was implemented. The files to look at are f
 | grid_omp_rand_trng/trng_calcNewGrid.cpp     | OpenMP function called each iteration using trng random library when in STOCHASTIC mode     |
 | grid_seq_rand_cpp/cpprandom_calcNewGrid.cpp | Sequential function called each iteration using C++ random library when in STOCHASTIC mode  |
 | grid_seq_rand_trng/trng_calcNewGrid.cpp     | Sequential function called each iteration using trng random library when in STOCHASTIC mode |
-The sequential versions are for reference for using these random libraries without parallelization with OpenMP. The Make file doesn't even build versions for this. But to see how it's done sequentiall, open `grid_seq_rand_cpp/cpprandom_calcNewGrid.cpp` and look for this line:
+The sequential versions are for reference for using these random libraries without parallelization with OpenMP. The Make file doesn't even build versions for this. But to see how it's done sequentially, open `grid_seq_rand_cpp/cpprandom_calcNewGrid.cpp` and look for this line:
 
 		#ifdef STOCHASTIC
 
@@ -277,7 +277,7 @@ void apply_rules(double randN, int *grid, int *newGrid, int id, int w) {
 
 The Makefile currently builds the OpenMP versions for this version of the code, which can be run with 1 thread, which would be the same as the sequential version. It does this by setting a flag when compiling. Look for this line in the Makefile:
 
-		##################################### Stchastic versions
+		##################################### Stochastic versions
 
 Just below there are where these are built, using the `-DSTOCHASTIC` flag. This ensures that the code between `#ifdef STOCHASTIC` and `#else` gets used when it makes the executable.
 
@@ -372,8 +372,7 @@ These just get you started- try others. Note that you could try other than squar
 
 ### Useful exercise for practice
 
-A -e flag has been added to the command line arguments: when set, it will print just what you need for running test scripts for scalability. The scalability and graphing exercise found in [this trapezoidal rule integration example problem]
-(https://github.com/csinparallel/CSinParallel/tree/main/Exemplars/TrapezoidIntegrationScaling) has some shell scripts for the 1-dimensional case, but we need to do things differently for two dimensions, as was mentioned above.
+A -e flag has been added to the command line arguments: when set, it will print just what you need for running test scripts for scalability. The scalability and graphing exercise found in [this trapezoidal rule integration example problem](https://github.com/csinparallel/CSinParallel/tree/main/Exemplars/TrapezoidIntegrationScaling) has some shell scripts for the 1-dimensional case, but we need to do things differently for two dimensions, as was mentioned above.
 
 Two python programs are provided in this repo for running the program that uses the trng random number generator library. They are named:
 
@@ -388,6 +387,19 @@ Here are a couple of simple ways to run them:
 Read through the scripts to see how they work. The output is very similar to the shell scripts provided for the trapezoidal rule example mentioned above, so you should be able to adapt it to the Google spreadsheet given for that example.
 
 If you only have the C++ random number library available, you will need to change the python script to call that version.
+
+### To judge what needs parallelizing, profile the sequential version
+
+When parallelizing a program like this, it is helpful to use a technique called profiling to examine which functions take the most time. This is where decomposed code like this with small functions that perform one part of the overall task come in very handy. In the case of this code, you will see both the functions in the source code you are given, and functions from the C++ random library. We will try a slightly larger case to see for this, using a linux tool called gprof and a small supplied python file that formats the result for readability. Try each of these steps at the command line:
+```
+./cpprand_gol_seq_prof -i 20 -w 800 -l 800 -d
+gprof -p ./cpprand_gol_seq_prof gmon.out >profile.txt
+python3 ./trimFileLines.py 
+```
+			
+Note that it tells you that the results were saved into a file called `trimmed_profile.txt`. Open that to observe the results (you should sync remote to local to get it on your own machine). The column on the left shows the percentage of overall time was spent in each of the functions listed on the right. Any function beginning in std:: indicates one from the C++ random library.  Note that although the functions `calcNewGrid` and `initGrid` appear lower on the list, each of them uses the C++ random library, so they also use quite a bit of the overall time, as seen in the column labeled "total ms/call".
+
+The function called `apply_rules` is in the file called gol_rules.cpp. It's important to recognize that this code was written so that this function is designed to work on one cell and is therefore **not a candidate for parallelizing**. The function that uses `apply_rules`, however, is called `calcNewGrid` and is one that is parallelized for you already in this code.
 
 ### For a Challenge
 

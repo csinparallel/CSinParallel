@@ -18,7 +18,7 @@ final.dat
 
 #files generated to make movies or graphical versions
 movie_images/*.png
-movie_images/*.mpeg
+movie_images/*.dat
 movie_images/*.mp4
 
 result.png

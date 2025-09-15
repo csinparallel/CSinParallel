@@ -6,7 +6,7 @@ Libby Shoop,  Macalester College
 Small parts of this activity were originally written by Aaron Weeden, Shodor Education Foundation, Inc. and adapted with permission by the author.
 
 This is an activity with working OpenMP code to demonstrate how to use OpenMP pragmas and random number generator libraries with nested loops over flattened arrays for structured grid simulations. Features:
-- An example of a parallel computational pattern called a **structured grid**, which uses a stencil and features multiple iterations over that grid using a "double buffereing" technique.
+- An example of a parallel computational pattern called a **structured grid**, which uses a stencil and features multiple iterations over that grid using a "double buffering" technique.
 - C++ code using two different random number generation  libraries:
 	- the C++ `random` library
 	- the `trng` library (requires an install)
@@ -304,6 +304,7 @@ Now let's observe the code for the nested loop in `grid_omp_rand_cpp/cpprandom_c
 
 			id = i * (w + 2) + j; // cell index in the flattened grid
 ```
+
 For each of these examples, l is the length of the grid (number of rows) ad w is the width of the grid (number of columns).
 
 To illustrate this parallel version, suppose we use 2 threads to compute these new values each time- this is a good use of parallelism because applying the rules in one cell and writing to the new grid is completely independent for every cell in an iteration. The key to correctly implementing this nested loop is to realize that for the random number generators, the correct approach is to have each thread work on a column in the flattened version of the array. The following shows this, with thread 0 working on the green cells of the flattened array, and thread 1 working on the blue cells:
@@ -316,7 +317,7 @@ To illustrate this parallel version, suppose we use 2 threads to compute these n
 You can also see this in action by doing this:
 
 ```
-./cpprand_stgol_omp -i 3 -w 4 -l 4 -d -c
+./cpprand_stgol_omp -i 3 -w 4 -l 4 -d -c -t 2
 ```
 
 This will print the random numbers generated at each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, an i,j of the cell. Look carefully and observe that thread 0 is working on id index 7, 9, 13, etc. and thread 1 is working on id index 8, 10, 14, etc.

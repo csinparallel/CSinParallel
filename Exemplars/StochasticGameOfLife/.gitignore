@@ -1,3 +1,5 @@
+trimmed_profile.txt
+
 #executables
 cpprand_gol_omp 
 cpprand_gol_seq 

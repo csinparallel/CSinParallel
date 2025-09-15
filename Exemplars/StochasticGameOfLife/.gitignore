@@ -1,0 +1,25 @@
+#executables
+cpprand_gol_omp 
+cpprand_gol_seq 
+cpprand_gol_seq_prof
+trng_gol_omp 
+trng_gol_seq
+cpprand_stgol_omp
+trng_stgol_omp
+
+#object files
+object_files/*.o
+
+#output file from running the programs
+initial.dat
+intermediate.dat
+final.dat
+*.dat
+
+#files generated to make movies or graphical versions
+movie_images/*.png
+movie_images/*.mpeg
+movie_images/*.mp4
+
+result.png
+

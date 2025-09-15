@@ -8,7 +8,7 @@
 
 void getArguments(int argc, char *argv[], int * width, int *length, int * iterations, 
                   int * debug, int *graphics, int *animation, int * movie, 
-                  int *centerInit, int *numThreads)
+                  int *centerInit, int *numThreads, int *experiment)
 {
   // arguments expected that have default values in the code: 
   //
@@ -25,7 +25,7 @@ void getArguments(int argc, char *argv[], int * width, int *length, int * iterat
 // m for dimension, t for threads, i for iterations, p for probThreshold, 
 // d for debug, v for verbose, a for animation, h for help
 // c for centerInit
-  while ((c = getopt (argc, argv, "w:l:i:t:dgahcm")) != -1) {
+  while ((c = getopt (argc, argv, "w:l:i:t:dgahcme")) != -1) {
 
     switch (c)
       {
@@ -96,6 +96,10 @@ void getArguments(int argc, char *argv[], int * width, int *length, int * iterat
         *movie = 1;
         break;
 
+      case 'e':
+        *experiment = 1;
+        break;
+
       case 'h':
         Usage(argv[0]);
         exit(EXIT_SUCCESS);
@@ -116,6 +120,8 @@ void getArguments(int argc, char *argv[], int * width, int *length, int * iterat
             (optopt == 'd') ||
             (optopt == 'a') ||
             (optopt == 'm') ||
+            (optopt == 'e') ||
+            (optopt == 'c') ||
             (optopt == 'g') 
            ) 
         {
@@ -167,6 +173,7 @@ void Usage(char *program) {
   fprintf(stderr, "  -a             : enable animation (default: off)\n");
   fprintf(stderr, "  -m             : create movie images (default: off)\n");
   fprintf(stderr, "  -c             : center initialization of glider pattern (default: off)\n");
+  fprintf(stderr, "  -e             : experiment mode (default: off)\n");
   fprintf(stderr, "  -h             : display this help message\n");
 
 }

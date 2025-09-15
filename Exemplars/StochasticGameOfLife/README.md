@@ -21,6 +21,7 @@ This is an activity with working OpenMP code to demonstrate how to use OpenMP pr
 - Some practice using parallel for loops in OpenMP (see [Chapter 2 of the Intermediate PDC](https://www.learnpdc.org/IntermediatePDC/2-SharedMemoryPatternlets/toctree.html) online textbook)
 - Practice with random number libraries such as the C++ random library or the parallel `trng` library (see [Chapter 3 of the Intermediate PDC](https://www.learnpdc.org/IntermediatePDC/3-RandomPatterns/toctree.html) online textbook)
 - Some instruction or activity for strong and weak scalability and depicting it with graphs. This repository provides such an activity, including how to use a pre-formatted Google sheet to graph strong and weak scalability: https://github.com/csinparallel/CSinParallel/tree/main/Exemplars/TrapezoidIntegrationScaling 
+
 ### Introduction to the application
 We will study some well-organized code that contains a sequential and parallel implementation of Conway's classic Game of Life [15] and a variation that introduces probability to its rules. The Game of life is in the class of applications known as *cellular automata*.
 
@@ -126,6 +127,7 @@ all: $(PROGS) $(STOCHASTIC_PROGS) #$(PROGS_TRNG) $(STOCHASTIC_PROGS_TRNG)
 
 ### A twist to the classic rules
 In paper [16] listed below, the authors added probability to the classic game of life rules, creating versions that are referred to as **stochastic**. This enabled them to realistically model the dynamics in a population of real organisms. We introduce versions of the code that implement part of their additions. This is what the STOCHASTIC_PROGS that get built are. We describe this implementation below.
+
 ### Using the sequential version to see how it works and profile
 
 The Makefile should build all versions by simply typing
@@ -151,6 +153,7 @@ Usage: ./cpprand_gol_seq [-m dim] [-i iterations] [-t numThreads] [-d] [-v] [-a]
   -a             : enable animation (default: off)
   -m             : create movie images (default: off)
   -c             : center initialization of glider pattern (default: off)
+  -e             : experiment mode (default:off)
   -h             : display this help message
 ```
 
@@ -184,14 +187,16 @@ diff tmpp1 tmpp2
 
 As we study the parallel implementations, we can always use the technique shown above, or we can also look directly at the output files that get printed in debug mode: `initial.dat` and `final.dat`. These contain the state of the grid at the beginning and end of the simulation.
 
-### Graphics and animation (requires gnuplot)
-If you have a machine that has gnuplot and a way of displaying X11 output remotely, you can run these examples.
+### Graphics and animation (requires gnuplot and a linux machine)
+If you have a machine that has gnuplot and are working directly from a linux machine, you can run these examples.
 
 To see the glider in action try this:
 ```
 ./cpprand_gol_seq -i 50 -w 20 -l 20 -a -c
 ```
 Note that we have used the -a flag for animation and the -c flag to start with the glider pattern. 
+
+### To just observe what it should look like
 
 There is a movie file of this animation in `docs_images/glider.mp4` [here](https://github.com/csinparallel/CSinParallel/blob/main/Exemplars/StochasticGameOfLife/docs_images/glider.mp4).
 
@@ -214,13 +219,20 @@ For some fun you could try other initial patterns. But first, we need to study t
 ---
 ##### Classic mode
 
-To run the game in a classic mode by initializing the grid with random live cells, we can do this:
+To run the game in a classic mode by initializing the grid with random live cells, we can do this if you are using a linux machine (otherwise read on):
 
 ```
 ./cpprand_gol_seq -i 50 -w 40 -l 40 -a -d 
 ```
 
-Using -a shows each iteration and -d means that you can run it multiple times and get the same result. Try it also with -g and -d  multiple times to verify that the final set of live cells in the grid is the same.
+Using -a shows each iteration and -d means that you can run it multiple times and get the same result. Try it also with -g and -d multiple times to verify that the final set of live cells in the grid is the same.
+Do it like this (you still need a means of remote X11 display):
+
+```
+./cpprand_gol_seq -i 50 -w 40 -l 40 -g -d 
+```
+
+This will display just the final state of the grid. It is also stored in a graphical file called result.png. If you eliminate the -g option from above, the file called final.dat shows the final result. Also, the total number of cells left tells you that it produced the same results in this sequential version.
 
 Then run without the -d to see that the result is different each time. 
 
@@ -262,6 +274,7 @@ void apply_rules(double randN, int *grid, int *newGrid, int id, int w) {
 // When randN is -1.0, it means we are not using the stochastic rules,
 // so we do not check for hardiness.
 ```
+
 The Makefile currently builds the OpenMP versions for this version of the code, which can be run with 1 thread, which would be the same as the sequential version. It does this by setting a flag when compiling. Look for this line in the Makefile:
 
 		##################################### Stchastic versions
@@ -282,7 +295,7 @@ In many cases of simulations like this where the world is represented by a struc
 
 <img src="./docs_images/matrix_flattened_1.drawio.png" alt="Grid with ghost rows and columns" >
 
-The yellow cells are the ghost row or column values, which get copied from the nearest real cell values during each iteration. The actual grid representing the data for the states of the mushrooms within it are in white. When executing sequentially, the function `calcNewGrid`  starts with cell (1,1) of the 2D grid, which is index 7 in the flattened 1D array representing the grid. In a nested loop, this function goes across each row of white cells to compute a random number and use it to call the `apply_rules` function. Study this function and be sure that you understand the computation of the index into the flattened array, which is the variable called `id`.
+The yellow cells are the ghost row or column values, which get copied from the nearest real cell values during each iteration. The actual grid representing the data for the states of the mushrooms within it are in white. When executing sequentially, the function `calcNewGrid` starts with cell (1,1) of the 2D grid, which is index 7 in the flattened 1D array representing the grid. In a nested loop, this function goes across each row of white cells to compute a random number and use it to call the `apply_rules` function. Study this function and be sure that you understand the computation of the index into the flattened array, which is the variable called `id`.
 
 Now let's observe the code for the nested loop in `grid_omp_rand_cpp/cpprandom_calcNewGrid.cpp`:
 ```
@@ -306,11 +319,12 @@ You can also see this in action by doing this:
 ./cpprand_stgol_omp -i 3 -w 4 -l 4 -d -c
 ```
 
-This will print the random numbers generated at each each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, an i,j of the cell. Look carefully and observe that thread 0 is working on id index 7, 9, 13, etc. and thread 1 is working on id index 8, 10, 14, etc.
+This will print the random numbers generated at each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, an i,j of the cell. Look carefully and observe that thread 0 is working on id index 7, 9, 13, etc. and thread 1 is working on id index 8, 10, 14, etc.
 
 Look at the code for the trng versions and note carefully how this library is used. Its use is slightly different, so look closely. Run some examples using `./trng_stgol_omp ` under different scenarios if you have access to this library.
 
-Also note in each version which  variables are private and which are shared. **BEWARE**: look carefully and list all the private variables- some are not in the pragma. Why is this?
+Also note in each version which variables are private and which are shared. **BEWARE**: look carefully and list all the private variables- some are not in the pragma. Why is this?
+
 ### Two different random libraries behave differently
 
 In the stochastic mode there are observable differences between these two random number libraries.
@@ -331,7 +345,7 @@ The trng library, on the other hand, is a truly parallel random generator, in th
 
 ### Examining scalability
 
-As a quick test of strong scalability, try these tests (try the trng version if you have it):
+As a quick test of **strong scalability**, try these tests (try the trng version also if you have it):
 ```
 ./cpprand_stgol_omp -i 150 -w 1000 -l 1000 -t 1
 ./cpprand_stgol_omp -i 150 -w 1000 -l 1000 -t 2
@@ -339,9 +353,9 @@ As a quick test of strong scalability, try these tests (try the trng version if 
 ./cpprand_stgol_omp -i 150 -w 1000 -l 1000 -t 8
 ```
 
-The times taken will depend on your machine. What do you observe? Can you make a statement about strong scalability of this application? What other tests would you run to be certain of which problems sizes demonstrate strong scalability and which do not?
+The times taken will depend on your machine. What do you observe? Can you make a statement about strong scalability of this application? What other tests would you run to be certain of which problem sizes demonstrate strong scalability and which do not?
 
-For weak scalability in particular, you need to consider the problem size in the two dimensions, width (number of columns) and length (number of rows) . Note the time as you run the following cases in the table below. Convince yourself that the number of cells (w x l) is doubling, leaving the number of iterations fixed. 
+For **weak scalability** in particular, you need to consider the problem size in the two dimensions, width (number of columns) and length (number of rows). Note the time as you run the following cases in the table below. Convince yourself that the number of cells (w x l) is doubling, leaving the number of iterations fixed. 
 
 What do you observe?
 
@@ -351,13 +365,28 @@ These just get you started- try others. Note that you could try other than squar
 | ----------------------------------------------- | ---- | ----------------------- |
 | ./cpprand_stgol_omp -i 150 -w 1200 -l 1200 -t 2 |      | 1200 x 1200 = 1,440,000 |
 | ./cpprand_stgol_omp -i 150 -w 1700 -l 1700 -t 4 |      | 1700 x 1700 = 2,890,000 |
-| ./cpprand_stgol_omp -i 150 -w 1200 -l 1200 -t 8 |      | 2400 x 2400 = 5,760,000 |
+| ./cpprand_stgol_omp -i 150 -w 2400 -l 2400 -t 8 |      | 2400 x 2400 = 5,760,000 |
 
-**IMPORTANT POINT** : In all of these cases for this application, using a fixed number of iterations are varying the size of the grid is how you can examine scalability. Can you describe why? Ask your instructor if you are stumped.
+**IMPORTANT POINT** : In all of these cases for this application, using a fixed number of iterations and varying the size of the grid is how you can examine scalability. Can you describe why? Ask your instructor if you are stumped.
+
 ### Useful exercise for practice
 
-Add a -e flag to the command line arguments that when set will print just what you need for running test scripts like those from the scalability and graphing exercise found here:
- https://github.com/csinparallel/CSinParallel/tree/main/Exemplars/TrapezoidIntegrationScaling 
+A -e flag has been added to the command line arguments: when set, it will print just what you need for running test scripts for scalability. The scalability and graphing exercise found in [this trapezoidal rule integration example problem]
+(https://github.com/csinparallel/CSinParallel/tree/main/Exemplars/TrapezoidIntegrationScaling) has some shell scripts for the 1-dimensional case, but we need to do things differently for two dimensions, as was mentioned above.
+
+Two python programs are provided in this repo for running the program that uses the trng random number generator library. They are named:
+
+- `runStrongTests.py`
+- `runWeakTests.py`
+
+Here are a couple of simple ways to run them:
+
+	python3 ./runStrongTests.py 600 600 4 2
+	python3 ./runWeakTest.py 1200 1200
+
+Read through the scripts to see how they work. The output is very similar to the shell scripts provided for the trapezoidal rule example mentioned above, so you should be able to adapt it to the Google spreadsheet given for that example.
+
+If you only have the C++ random number library available, you will need to change the python script to call that version.
 
 ### For a Challenge
 

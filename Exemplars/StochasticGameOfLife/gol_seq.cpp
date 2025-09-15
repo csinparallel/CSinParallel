@@ -50,17 +50,19 @@ int main(int argc, char *argv[]) {
     int centerInit = 0;
 
     int numThreads = 1;  // not used in sequential version, but ready for openMP
+    int experiment = 0;  // whether to run in experiment mode (just print time)
 
     // grab the command line arguments
     getArguments(argc, argv, &width, &length, &itEnd, &debug, &graphics,
-                 &animation, &movie, &centerInit, &numThreads);
+                 &animation, &movie, &centerInit, &numThreads, &experiment);
 
     // !#!#!#!#!#!#!#!#
     // for sequential version, keep numThreads at 1. REMOVE FOR OpenMP
     numThreads = 1;  // set to 1 for sequential version
     // !#!#!#!#!#!#!#!# FIX ABOVE LINE FOR openMP version by removing
     omp_set_num_threads(numThreads);
-    printf("Using %d threads\n", numThreads);
+    if (!experiment)
+        printf("Using %d threads\n", numThreads);
 
     // grid array with dimension width x length + ghost columns and rows
     int arraySize = (width + 2) * (length + 2);
@@ -70,8 +72,11 @@ int main(int argc, char *argv[]) {
     // allocate result grid
     int * /*restrict*/ newGrid = (int *)malloc(bytes);
 
-    printf("debug %d   graphics %d    dim %d w x %d l   iter %d   \n", debug, graphics, width, length, itEnd);
-    printf("centerGlider %d   movie %d   animation %d\n", centerInit, movie, animation);
+    if (!experiment) {
+        printf("debug %d   graphics %d    dim %d w x %d l   iter %d   \n", debug, graphics, width, length, itEnd);
+        printf("centerGlider %d   movie %d   animation %d\n", centerInit, movie, animation);
+    }
+
     long unsigned int seed;
     if (debug) {
         seed = (long unsigned int)SEED;
@@ -156,7 +161,13 @@ int main(int argc, char *argv[]) {
     // end timing
     double runtime = omp_get_wtime() - st;
      
-    printf("Total time: %f s\n", runtime);
+    if (!experiment) {
+        printf("Total time: %f s\n", runtime);
+    } else {
+        // for experiments, print out just the time with a tab
+        printf("%lf\t", runtime);
+    }
+    
 
     // sum up cells (low level check of correctness)
     for (i = 1; i <= length; i++) {
@@ -164,9 +175,11 @@ int main(int argc, char *argv[]) {
             total += grid[i * (width + 2) + j];
         }
     }
-    printf("Total: %d\n", total);
 
-    if (graphics || debug) {
+    if (!experiment)
+        printf("Total: %d\n", total);
+
+    if (graphics || debug || movie) {
         prtdat(width, length, grid, "final.dat");
     }
 

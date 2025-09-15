@@ -34,7 +34,7 @@ PROF_OPTS = -pg -g -O0
 
 # These use randomness when creating a starting grid
 PROGS =  cpprand_gol_omp cpprand_gol_seq cpprand_gol_seq_prof
-# Initially, these do not use trng- it's an excresise to add it
+# Initially, these do not use trng- it's an optional exercise to add it
 PROGS_TRNG =  trng_gol_omp trng_gol_seq
 # These use randomness when deciding on the hardiness of a live cell
 STOCHASTIC_PROGS = cpprand_stgol_omp

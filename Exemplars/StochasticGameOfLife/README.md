@@ -106,7 +106,7 @@ Please look at the Makefile to see the following lines:
 # These use randomness when creating a starting grid
 PROGS = cpprand_gol_omp cpprand_gol_seq cpprand_gol_seq_prof
 
-# Initially, these do not use trng- it's an excresise to add it
+# Initially, these do not use trng- it's an optional exercise to add it
 PROGS_TRNG = trng_gol_omp trng_gol_seq
 
 # These use randomness when deciding on the hardiness of a live cell
@@ -161,7 +161,7 @@ In the case of the sequential version, we've forced the number of threads to be 
 
 The -d option is used to test whether the results are the same when repeated. In this 'debug' mode, the random number generator is initiated with a fixed seed. You can find this near line 76 of the file `gol_seq.cpp`.
 
-The -c option is also used for debugging: it creates an interesting starting pattern  of live cells called a *glider* that moves across the screen in each iteration.
+The -c option is also used for debugging: it creates an interesting starting pattern of live cells called a *glider* that moves across the screen in each iteration.
 
 The -g, -a, and -m options require the linux plotting package called gnuplot to be installed. The motion mentioned above for the glider can only been seen if you have gnuplot available, as well as any other visualization of the game at each iteration.
 
@@ -176,9 +176,9 @@ There is another debugging tool built into this code, which is this line that pr
 
 		Total: 5
 
-This is the total number of live cells at the end of the simulation. You can also use this whe you try larger cases, even if you don't have the gnuplot graphics available.
+This is the total number of live cells at the end of the simulation. You can also use this when you try larger cases, even if you don't have the gnuplot graphics available.
 
-The above is the sequential version. In this case we are not using random numbers at all because we chose the glider pattern to initialize the grid. You can run the OpenMp version with 1 and 2 threads to see that it is working correctly in terms of the OpenMP pragmas found in the file `grid_omp_rand_cpp/cpprandom_calcNewGrid.cpp`. Have a look at this file now to see the OpenMP pragma used on the nested loop over the 2D grid. Here's a series of test you can do to check that the results are the same except for the time taken and the number of threads used for each one:
+The above is the sequential version. In this case we are not using random numbers at all because we chose the glider pattern to initialize the grid. You can run the OpenMp version with 1 and 2 threads to see that it is working correctly in terms of the OpenMP pragmas found in the file `grid_omp_rand_cpp/cpprandom_calcNewGrid.cpp`. Have a look at this file now to see the OpenMP pragma used on the nested loop over the 2D grid. Here's a set of tests you can do to check that the results are the same except for the time taken and the number of threads used for each one:
 ```
 ./cpprand_gol_omp -i 3 -w 8 -l 8 -d -c -t 1 >tmpp1
 ./cpprand_gol_omp -i 3 -w 8 -l 8 -d -c -t 2 >tmpp2
@@ -257,7 +257,8 @@ Now let's look carefully at how this was implemented. The files to look at are f
 | grid_omp_rand_trng/trng_calcNewGrid.cpp     | OpenMP function called each iteration using trng random library when in STOCHASTIC mode     |
 | grid_seq_rand_cpp/cpprandom_calcNewGrid.cpp | Sequential function called each iteration using C++ random library when in STOCHASTIC mode  |
 | grid_seq_rand_trng/trng_calcNewGrid.cpp     | Sequential function called each iteration using trng random library when in STOCHASTIC mode |
-The sequential versions are for reference for using these random libraries without parallelization with OpenMP. The Make file doesn't even build versions for this. But to see how it's done sequentially, open `grid_seq_rand_cpp/cpprandom_calcNewGrid.cpp` and look for this line:
+
+The sequential versions are for reference for using these random libraries without parallelization with OpenMP. The Makefile doesn't even build versions for this. But to see how it's done sequentially, open `grid_seq_rand_cpp/cpprandom_calcNewGrid.cpp` and look for this line:
 
 		#ifdef STOCHASTIC
 
@@ -320,7 +321,7 @@ You can also see this in action by doing this:
 ./cpprand_stgol_omp -i 3 -w 4 -l 4 -d -c -t 2
 ```
 
-This will print the random numbers generated at each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, an i,j of the cell. Look carefully and observe that thread 0 is working on id index 7, 9, 13, etc. and thread 1 is working on id index 8, 10, 14, etc.
+This will print the random numbers generated at each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, and i,j of the cell. Look carefully and observe that thread 0 is working on id index 7, 9, 13, etc. and thread 1 is working on id index 8, 10, 14, etc.
 
 Look at the code for the trng versions and note carefully how this library is used. Its use is slightly different, so look closely. Run some examples using `./trng_stgol_omp ` under different scenarios if you have access to this library.
 

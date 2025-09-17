@@ -33,11 +33,12 @@ void calcNewGrid(unsigned long int seed, int *grid, int *newGrid, int w, int l, 
             for (j = 1; j <= w; j ++) {  // goal: each thread works on a different column            
 
                 int id = i * (w + 2) + j; // cell index in the flattened grid
-
+                
+#ifdef STOCHASTIC
                 if (w <= 8 && l <= 8) {// for debugging, print the random number and indices
                     printf("%f %d %d %d |\n", randN, id, i, j);
                 }
-#ifdef STOCHASTIC
+
                 randN = uni(RNengine2);              // inside loop
                 // Implementing the Stochastic Game of Life Rules
                 apply_rules(randN, grid, newGrid, id, w);

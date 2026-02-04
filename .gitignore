@@ -38,6 +38,7 @@ roulette_seq
 loopRepetitions
 loopEqualChunks
 loopChunksOfOne
-nestedLoopsMC
-
+loopUnEqualChunks
+arrayLoopUnequalChunks
+2DArrayNestedLoop
 

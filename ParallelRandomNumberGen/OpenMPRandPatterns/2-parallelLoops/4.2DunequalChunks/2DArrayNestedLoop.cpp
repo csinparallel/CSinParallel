@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 {
 
   // set up what conditions we will use:
-  //  - defult size of repetitions in the loop
+  //  - default size of repetitions in the loop
   //  - whether to use a constant seed so we can repeat and
   //    get same random values in stream
 

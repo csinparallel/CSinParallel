@@ -2,10 +2,10 @@
  * Parallel version of a loop that generates random integers
  * using the trng library.
  * This version uses the data decomposition method that splits
- * a for loop into equal chunks.
+ * a for loop into equal chunks or unequal chunks that are off by at most one.
  *
  * Libby Shoop
- *  September, 2022
+ *  December, 2025
  */
 #include <stdio.h>  // printf()
 #include <time.h>   // time()
@@ -15,6 +15,8 @@
 
 // separate file for handling command line arguments
 #include "../utils/getCommandLine.h"
+// separate file for handling unequal chunk calculation
+#include "../utils/chunks.h"
 
 // trng YARN (yet another random number) generator class
 #include <trng/yarn2.hpp>
@@ -50,6 +52,17 @@ int main(int argc, char *argv[])
   getArguments(argc, argv, &numThreads, &repetitions,
                &useConstantSeed, &doleOut);
 
+  //check ifvalid number of threads vs repetitions
+  if (numThreads > repetitions) {
+      printf("\n*** Number of threads (%u) exceeds repetitions (%u)\n", numThreads, repetitions);
+      printf("*** Please run with -t value less than or equal to %u\n\n", repetitions);
+      
+      return 0;
+  }
+
+  // create an array to hold the random numbers on the 'heap
+  int* randNumbers = new int[repetitions]{0};
+
   // openMP additions +++++++++++++++++++++++++++++++++++++++++++
   int tid = 0;
   omp_set_num_threads(numThreads);
@@ -63,7 +76,7 @@ int main(int argc, char *argv[])
   {
     printf("into blocks.\n");
   }
-  printf("The loop is partitioned into equal chunks per thread.\n");
+  printf("The loop is partitioned into possibly slightly unequal chunks per thread.\n");
   printf("This means that the loop indices should be consecutive per thread.\n");
   printf("the output is printed like this:\n");
   printf("thread (loop index):randNumber\n");
@@ -101,7 +114,7 @@ int main(int argc, char *argv[])
 //
 // //////////////   begin fork here by using pragma for the compiler
 #pragma omp parallel default(none) private(tid) \
-    shared(seedValue, repetitions, min, max, numThreads, doleOut)
+    shared(seedValue, repetitions, min, max, numThreads, doleOut, randNumbers)
   {
     // number generation needs two things: a generator and a distribution of the numbers
     // declare the generator object
@@ -128,11 +141,13 @@ int main(int argc, char *argv[])
       else
       {
         // thread will get substream as a block:
-        // thread 0 starts at 0, thread 1 starts at repetitions / numThreads, etc.
-        // Note: this works correctly only if repetitions is evenly divisible by numThreads.
-        // Uncomment the next line to check the jump value
-        // printf("tid, jump val: %d %d\n", tid, repetitions / numThreads);
-        randGen.jump(tid * (repetitions / numThreads)); // block split
+        // Each thread gets a slightly different number of random numbers from 
+        // the stream depending on whether repetitions divides evenly by numThreads
+        unsigned start, stop;
+        getChunkStartStopValues(tid, numThreads, (const unsigned)repetitions,
+                              &start, &stop);
+        // printf("tid, jump val: %d %d\n", tid, start); // uncomment to check jump value
+        randGen.jump(start); // block split slightly unevenly
       }
     }
     // //////////////// end PRNG setup /////////////////////////////////
@@ -143,18 +158,33 @@ int main(int argc, char *argv[])
     // loop to get each number in the PRNG stream and print it
     // Note here the ubiquitous for loop construction of incrementing by 1-
     //   this leads itself nicely to letting the openMP compiler split the
-    //   loop into equal chunks using the pragma shown.
+    //   loop into equal chunks or chunks whose size is off by at most 1
+    //   using the pragma shown.
+    // We are in the forked parallel region already, so just need the for pragma
+    // and nextRandValue and i are private to each thread;
+    // repetions and randNumbers are shared.
     int i;
 #pragma omp for
-    for (i = 0; i < repetitions; i++)
-    {
+    for (i = 0; i < repetitions; i++) {
       // get next number in the stream from the distribution
       nextRandValue = uniform(randGen);
-      // print tid(i):nextRandValue
       printf("t%2d (%2d):%2d \n", tid, i, nextRandValue);
+      // store the random number in the array
+      randNumbers[i] = nextRandValue;
     }
 
   } // end of parallel block
+
+  // print out the random numbers in order from the array
+  printf("\nRandom numbers in order from the array:\n");
+  for (int i = 0; i < repetitions; i++) {
+    printf("(%2d)\t", i);
+  }
+  printf("\n");
+  for (int i = 0; i < repetitions; i++) {
+    printf("% 2d\t", randNumbers[i]);
+  }
+  printf("\n");
 
   return 0;
 }

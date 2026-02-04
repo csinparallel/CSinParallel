@@ -114,7 +114,10 @@ shared(seedValue,repetitions, min, max, numThreads, doleOut)
       } else {
         // thread will get substream as a block: 
         // thread 0 starts at 0, thread 1 starts at repetitions / numThreads, etc.
-        randGen.jump(tid * (repetitions / numThreads));   // block split
+        // Note: this works correctly only if repetitions is evenly divisible by numThreads.
+        // Uncomment the next line to check the jump value
+        // printf("tid, jump val: %d %d\n", tid, repetitions / numThreads);
+        randGen.jump(tid * (repetitions / numThreads));   // block split evenly
       }
     }
     // /////////////////////// end PRNG setup ///////////////////////////////////

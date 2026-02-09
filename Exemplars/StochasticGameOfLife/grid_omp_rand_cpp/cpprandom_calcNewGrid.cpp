@@ -36,7 +36,7 @@ void calcNewGrid(long unsigned int seed, int *grid, int *newGrid, int w, int l, 
         // iterate over the grid (not the ghost rows and columns)
         // each thread works on a block of rows
         for (i = startRow+1; i <= endRow; i++) {
-            for (j = 0; j < w; j++) { 
+            for (j = 1; j <=w; j++) { 
 
                 id = i * (w + 2) + j;    // cell index in the flattened grid
 #ifdef STOCHASTIC

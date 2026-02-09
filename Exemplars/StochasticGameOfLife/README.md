@@ -80,6 +80,7 @@ The directories in this repository are as follows:
 | ./grid_seq_rand_trng/ | Sequential version of the grid functions if you are using the trng random number library                                         |
 | ./movie_images/       | This is where images will be stored that can be used to create an mpeg movie                                                     |
 | ./object_files/       | This is where the code in the commandline and graphics folders gets compiled into object files                                   |
+
 Here is an explanation of the code files within the above directories and in this directory:
 
 | Code File                                   | Description                                                                                                             |
@@ -93,7 +94,8 @@ Here is an explanation of the code files within the above directories and in thi
 | grid_seq_rand_cpp/cpprandom_initGrid.cpp    | Sequential function called once to initialize the grid with random alive cells using C++ random library                 |
 | grid_seq_rand_trng/trng_calcNewGrid.cpp     | Sequential function called each iteration using trng random library when in STOCHASTIC mode                             |
 | grid_seq_rand_trng/trng_initGrid.cpp        | Sequential function called once to initialize the grid with random alive cells (exercise is to use trng random library) |
-| grid_common.cpp                             | Functions printGrid and prdat used in all  versions of the program                                                      |
+| grid_common.cpp                             | Functions printGrid and prdat used in all versions of the program                                                       |
+| chunks.h                                    | Functions to determine start and stop indexes of cells or rows in a grid assigned to a thread                           |
 | gol_omp.cpp                                 | OpenMP version containing main() that you will study carefully                                                          |
 | gol_rules.cpp                               | The apply_rules function that encodes the rules described above                                                         |
 | gol_seq.cpp                                 | Sequential version containing main() to use for reference.                                                              |
@@ -300,18 +302,18 @@ The yellow cells are the ghost row or column values, which get copied from the n
 
 Now let's observe the code for the nested loop in `grid_omp_rand_cpp/cpprandom_calcNewGrid.cpp`:
 ```
-	for (i = 1; i <= l; i++) {
-		for (j = 1 + tid; j <= w; j += numThreads) { // each thread works on a different column
+    for (i = startRow+1; i <= endRow; i++) {
+        for (j = 1; j <= w; j++) { 
 
-			id = i * (w + 2) + j; // cell index in the flattened grid
+            id = i * (w + 2) + j;    // cell index in the flattened grid
 ```
 
-For each of these examples, l is the length of the grid (number of rows) ad w is the width of the grid (number of columns).
+For each of these examples, l is the length of the grid (number of rows) ad w is the width of the grid (number of columns) for the game, without the ghost rows. The `startRow` and `endRow` variables are the beginning and end row for a particular thread to work on in the full grid, including the ghost rows. 
 
-To illustrate this parallel version, suppose we use 2 threads to compute these new values each time- this is a good use of parallelism because applying the rules in one cell and writing to the new grid is completely independent for every cell in an iteration. The key to correctly implementing this nested loop is to realize that for the random number generators, the correct approach is to have each thread work on a column in the flattened version of the array. The following shows this, with thread 0 working on the green cells of the flattened array, and thread 1 working on the blue cells:
+To illustrate this parallel version, suppose we use 2 threads to compute these new values each time- this is a good use of parallelism because applying the rules in one cell and writing to the new grid is completely independent for every cell in an iteration. The key to correctly implementing this nested loop is to realize that for the random number generators, the most effective approach is to have each thread work on a set of rows in the flattened version of the array. The following shows this, with thread 0 working on the green cells of the flattened array, and thread 1 working on the blue cells:
 
 
-<img src="./docs_images/matrix_flattened_2.drawio.png" alt="2 Threads work on columns of Grid" >
+<img src="./docs_images/matrix_flattened_blocked_rows.png" alt="2 Threads work on rows of Grid" >
 
 **STOP and ponder**: convince yourself that the code for the nested loop will work as shown in this picture above for a 4x4 grid.
 
@@ -321,11 +323,29 @@ You can also see this in action by doing this:
 ./cpprand_stgol_omp -i 3 -w 4 -l 4 -d -c -t 2
 ```
 
-This will print the random numbers generated at each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, and i,j of the cell. Look carefully and observe that thread 0 is working on id index 7, 9, 13, etc. and thread 1 is working on id index 8, 10, 14, etc.
+This will print the random numbers generated at each iteration by each thread. The values printed for each iteration are the random number, the id, the thread id, and i,j of the cell. Look carefully and observe which cells thread 0 and thread 2 are working on.
 
 Look at the code for the trng versions and note carefully how this library is used. Its use is slightly different, so look closely. Run some examples using `./trng_stgol_omp ` under different scenarios if you have access to this library.
 
 Also note in each version which variables are private and which are shared. **BEWARE**: look carefully and list all the private variables- some are not in the pragma. Why is this?
+
+### Code is designed for unequal blocks of rows per thread
+
+This code will distribute random numbers in blocks with unequal numbers of rows, making it much more versatile. Rather than needing to ensure that the number of rows in the grid is divisible by the number of threads, as shown above, we can handle situations where this is not the case. With a 5 by 5 grid, for example, 2 threads would work on these green and blue portions of the grid respectively:
+
+<img src="./docs_images/5x5matrix_flattened_block_2threads.png" alt="2 Threads work on rows of 5 by 5 Grid" >
+
+And if three threads are used, the distribution would be like this (thread 0 green, thread 1 blue, thread 2 orange):
+
+<img src="./docs_images/5x5matrix_flattened_block_3threads.png" alt="2 Threads work on rows of 5 by 5 Grid" >
+
+And to follow on with that, using 4 threads, the assignment looks like this (with the assigned rows for thread 3 shown in purple):
+
+<img src="./docs_images/5x5matrix_flattened_block_4threads.png" alt="2 Threads work on rows of 5 by 5 Grid" >
+
+The code in the file called `chunks.h` contains the function that assigns the start and end row that each thread will work on, based on the size of the grid and the number of threads. This enables us to have each thread create random numbers in blocks whose sizes differ by at most one row.
+
+<img src="./docs_images/exclamation-in-triangle.jpg" alt="Note" width="30" height="30"> Working on a flattened grid in this fashion is the most effective use of memory cache, since contiguous cells in the array will be updated by separate threads.
 
 ### Two different random libraries behave differently
 
@@ -335,7 +355,7 @@ Each one is implemented differently 'under the hood', so even with the same seed
 
 The C++ random library gives slightly different results when increasing the number of threads, but the trng one is the same. **This is how the C++ random library works.** Google's AI assistant implies this when given this search: "std::mt19937 generator". This even references trng as an alternative for parallel code simulations. 
 
-The trng library, on the other hand, is a truly parallel random generator, in that across the multiple iterations of the simulation's main loop, the random number stream remains the same, regardless of how many threads are used. This can be seen by starting with a given constant seed by using the -d option. As a quick check, try these and not that the same number of cells are alive at the end:
+The trng library, on the other hand, is a truly parallel random generator, in that across the multiple iterations of the simulation's main loop, the random number stream remains the same, regardless of how many threads are used. This can be seen by starting with a given constant seed by using the -d option. As a quick check, try these and note that the same number of cells are alive at the end:
 
 
 ```

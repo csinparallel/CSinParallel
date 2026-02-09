@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "../calcNewGrid.hpp"
 #include "../gol_rules.hpp"
+#include "../chunks.h"
 
 #include <trng/uniform01_dist.hpp>
 #include <trng/lcg64.hpp>
@@ -10,7 +11,7 @@
 
 void calcNewGrid(unsigned long int seed, int *grid, int *newGrid, int w, int l, int it) {
 
-    trng::lcg64 RNengine2;       // generator
+    trng::lcg64 RNengine;       // generator
     trng::uniform01_dist<> uni;  // distribution for random numbers
 
     // for debugging, print the iteration number
@@ -20,7 +21,7 @@ void calcNewGrid(unsigned long int seed, int *grid, int *newGrid, int w, int l, 
     }
 
     #pragma omp parallel default(none) \
-    shared(grid, newGrid, w, l, it, seed) private(RNengine2, uni)
+    shared(grid, newGrid, w, l, it, seed) private(RNengine, uni)
     {
         int i, j;        
 
@@ -28,18 +29,23 @@ void calcNewGrid(unsigned long int seed, int *grid, int *newGrid, int w, int l, 
         int numThreads = omp_get_num_threads();
 
         double randN;
-
+        // for block split of random numbers
+        // initialize to full grid 
+        int startRow =0;
+        int endRow = l+1; 
 #ifdef STOCHASTIC
-        RNengine2.seed((long unsigned int)(seed+it));  // reseed for each iteration
+        RNengine.seed((long unsigned int)(seed+it));  // reseed for each iteration
 
-        if (numThreads > 1) {
-            RNengine2.split((unsigned)numThreads, tid);
-        } 
+        // Use block splitting to partition random numbers among threads
+        getStartStopRow(tid, numThreads, l, &startRow, &endRow);   // enables unequal blocks per thread
+        long unsigned int numsToSkip = (long unsigned int)startRow * (long unsigned int)w;
+        RNengine.jump(numsToSkip);
 #endif
 
         // iterate over the grid (not the ghost rows and columns)
-        for (i = 1; i <= l; i++) {
-            for (j = 1 + tid; j <= w; j += numThreads) {  // each thread works on a different column
+        // each thread works on a block of rows
+        for (i = startRow+1; i <= endRow; i++) {
+            for (j = 0; j < w; j++) { 
                 int id = i * (w + 2) + j;    // cell index in the flattened grid
 
 #ifdef STOCHASTIC
@@ -47,7 +53,7 @@ void calcNewGrid(unsigned long int seed, int *grid, int *newGrid, int w, int l, 
                     printf("%f %d %d %d %d |\n", randN, id, tid, i, j);
                 }
 
-                randN = uni(RNengine2);              // get new number inside loop
+                randN = uni(RNengine);              // get new number inside loop
                 // Implementing the Stochastic Game of Life Rules
                 apply_rules(randN, grid, newGrid, id, w);
 #else

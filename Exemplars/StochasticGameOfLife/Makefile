@@ -10,7 +10,7 @@ OBJ_DIR = object_files
 OBJS= $(OBJ_DIR)/getCommandLine.o $(OBJ_DIR)/display.o $(OBJ_DIR)/gnuplot_i.o 
 
 COMMON_SRC_FILES = grid_common.cpp gol_rules.cpp
-COMMON_HEADER_FILES = grid_common.hpp gol_rules.hpp initGrid.hpp calcNewGrid.hpp
+COMMON_HEADER_FILES = grid_common.hpp gol_rules.hpp initGrid.hpp calcNewGrid.hpp chunks.h
 
 # Directories containing source files specific to the random number generation method
 GRID_SEQ_CPPRAND_DIR = grid_seq_rand_cpp

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "../calcNewGrid.hpp"
 #include "../gol_rules.hpp"
+#include "../chunks.h"
 
 
 void calcNewGrid(long unsigned int seed, int *grid, int *newGrid, int w, int l, int it) {
@@ -24,10 +25,18 @@ void calcNewGrid(long unsigned int seed, int *grid, int *newGrid, int w, int l, 
         int tid = omp_get_thread_num();
         int numThreads = omp_get_num_threads();
 
+        // for block of random numbers by rows
+        // initialize to full grid
+        int startRow =0;
+        int endRow = l+1; 
+
+        getStartStopRow(tid, numThreads, l, &startRow, &endRow);   // enables unequal blocks per thread
+
  
         // iterate over the grid (not the ghost rows and columns)
-        for (i = 1; i <= l; i++) {
-            for (j = 1 + tid; j <= w; j += numThreads) {  // each thread works on a different column
+        // each thread works on a block of rows
+        for (i = startRow+1; i <= endRow; i++) {
+            for (j = 0; j < w; j++) { 
 
                 id = i * (w + 2) + j;    // cell index in the flattened grid
 #ifdef STOCHASTIC
